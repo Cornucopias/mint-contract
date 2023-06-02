@@ -1,0 +1,63 @@
+{
+  "721": {
+    "46e607b3046a34c95e7c29e47047618dbf5e10de777ba56c590cfd5c": {
+      "NEWM_0": {
+        "album_title": "Bigger Dreams",
+        "artists": [
+          {
+            "name": "MURS"
+          }
+        ],
+        "copyright": [
+          "© 2022 Moodswingz Muzik",
+          "℗ 2022 Moodswingz Cryptomedia Group LLC"
+        ],
+        "country_of_origin": "United States",
+        "distributor": "https://newm.io",
+        "explicit": "false",
+        "files": [
+          {
+            "mediaType": "audio/flac",
+            "name": "Bigger Dreams",
+            "src": "ar://P141o0RDAjSYlVQgTDgHNAORQTkMYIVCprmD_dKMVss"
+          },
+          {
+            "mediaType": "application/pdf",
+            "name": "Streaming Royalty Share Agreement",
+            "src": "ar://TWyFwxeOIxSLwpycUhShngv8hpialA6DEQPEHJXbDpo"
+          }
+        ],
+        "genres": [
+          "Hip Hop",
+          "Rap"
+        ],
+        "image": "ar://CuPFY2Ln7yUUhJX09G530kdPf93eGhAVlhjrtR7Jh5w",
+        "isrc": "QZ-NW7-22-20045",
+        "links": {
+          "TikTok": "https://www.tiktok.com/@moodswingzmuzik",
+          "artist_twitter": "https://twitter.com/MURS",
+          "facebook": "https://www.facebook.com/moodswingzcryptomedia",
+          "instagram": "https://www.instagram.com/moodswingzmuzik",
+          "twitter": "https://twitter.com/moodswingzmuzik",
+          "website": "http://MoodswingzMuzik.com"
+        },
+        "lyricists": [
+          "MURS"
+        ],
+        "mastering_engineer": "Abyss",
+        "mediaType": "image/webp",
+        "mix_engineer": "Abyss",
+        "mood": "Feel Good",
+        "music_metadata_version": 1,
+        "name": "MURS - Bigger Dreams",
+        "producer": "Abyss",
+        "release_type": "Single",
+        "song_duration": "PT4M0S",
+        "song_title": "Bigger Dreams",
+        "track_number": 1,
+        "visual_artist": "Abyss"
+      }
+    },
+    "version": 1
+  }
+}

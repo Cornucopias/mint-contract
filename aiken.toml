@@ -1,0 +1,19 @@
+name = "aiken-lang/mint_contract"
+version = "0.0.1"
+license = "Apache-2.0"
+description = "Aiken contracts for project 'aiken-lang/mint_contract'"
+
+[repository]
+user = "aiken-lang"
+project = "mint_contract"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "main"
+source = "github"
+
+[[dependencies]]
+name = "logicalmechanism/assist"
+version = "main"
+source = "github"

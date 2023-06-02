@@ -1,0 +1,20 @@
+{
+  "721": {
+    "policy_id": {
+      "token_name": {
+        "album_title": "A Song",
+        "artists": [
+          {
+            "name": "You"
+          }
+        ],
+        "copyright": [
+          "© 2022 Fake LLC"
+        ],
+        "country_of_origin": "United States",
+        "track_number": 1
+      }
+    },
+    "version": 1
+  }
+}

@@ -1,0 +1,72 @@
+{
+    "721":
+    {
+        "<policy_id_hex>":
+        {
+            "<asset_name_ascii>":
+            {
+                "image": "ar://LeCOQJfG2EYmxxT-ix_qcrfSW4oaUTCk_IkadbkfSjo",
+                "mediaType": "image/webp",
+                "name": "Oddshapeshadow - Show Me",
+                "artists":
+                [
+                    {
+                        "name": "Oddshapeshadow"
+                    }
+                ],
+                "album_title": "Show Me",
+                "track_number": 1,
+                "song_title": "Show Me",
+                "song_duration": "PT3M22S",
+                "genres": ["House", "EDM", "Electronic"],
+                "numbers": [1,2,3,4,5,6],
+                "copyright": "℗ Oddshapeshadow",
+                "release_type": "Single",
+                "music_metadata_version": 1,
+                "isrc": "QZ-NW7-23-27265",
+                "metadata_language": "en-US",
+                "language": "en-US",
+                "distributor": "https://newm.io",
+                "release_date": "2023-02-20",
+                "mastering_engineer": "Theo Scape",
+                "files":
+                [
+                    {
+                        "name": "Show Me",
+                        "mediaType": "audio/flac",
+                        "src": "ar://ZyLvNWhvQx9qJAL1aIPlamo2W3mS7HtljsHvehSbA2k"
+                    },
+                    {
+                        "name": "Streaming Royalty Share Agreement",
+                        "mediaType": "application/pdf",
+                        "src": "ar://8Z9924x1zxX1wvf1bLcUyEFDkFYcrUYoUZ6jllSUuPY"
+                    }
+                ],
+                "links" : {
+                    "twitter": "https://twitter.com/mgbedford",
+                    "discord_invite": "https://discord.gg/kmBWdPsFsk",
+                    "discord_username": "Oddshapeshadow#9974",
+                    "soundcloud": "https://soundcloud.com/oddshapeshadow",
+                    "num_of": 4,
+                    "attr": {
+                        "inventor": "stake1uxc2vzvvddajcpl6ck7hyey030mrhapux3ca952r62dd4wcux73zh",
+                        "recipe": [
+                           "FIRE",
+                           "FIRE",
+                           "FIRE",
+                           "FIRE"
+                        ]
+                     }
+
+                },
+                "description": [
+                    "SWING II - Digital painting by Trong Le.\nA flashback to our chil",
+                    "dhood, when we were kids, let the swing bring my mind to limbo l",
+                    "and.\nThe physical version is a painting by Trong Le with acrylic",
+                    " and oil pastel on canvas."
+                ]
+            }
+        },
+        "version": 1
+    }
+}
