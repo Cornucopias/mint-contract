@@ -52,7 +52,6 @@ validator(hot_key: ByteArray) {
           RemoveMeta ->
             list.and(
               [
-                // no destination validation
                 // cornucopias must sign it
                 signing.verify_sig(tx, hot_key),
                 // single script input
