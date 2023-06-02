@@ -1,11 +1,42 @@
 use aiken/list
 use aiken/transaction.{ScriptContext, Spend}
-use aiken/transaction/value
+use aiken/transaction/value.{Value}
 use assist/count
 use assist/find
 use assist/payout
 use assist/signing
 use mint_contract/types.{CIP68Datum, CIP68Redeemer, RemoveMeta, UpdateMeta}
+
+/// This adds or subtracts some amount of lovelace from a value. Adding is when
+/// the direction is zero, anything else is subtraction.
+///
+fn add_or_subtract(self: Value, lovelace: Int, direction: Int) -> Value {
+  let lovelace_value = value.from_lovelace(lovelace)
+  // set a direction to add or remove the minimum lovelace
+  when direction is {
+    // addition
+    0 -> value.add(self, lovelace_value)
+    // subtract
+    _ -> value.add(self, value.negate(lovelace_value))
+  }
+}
+
+test zero_value() {
+  let val = value.from_lovelace(100)
+  add_or_subtract(val, 0, 1) == add_or_subtract(val, 0, 0)
+}
+
+test add_value() {
+  let val = value.from_lovelace(100)
+  let result = value.from_lovelace(200)
+  add_or_subtract(val, 100, 0) == result
+}
+
+test sub_value() {
+  let val = value.from_lovelace(100)
+  let result = value.zero()
+  add_or_subtract(val, 100, 1) == result
+}
 
 validator(hot_key: ByteArray) {
   fn params(
@@ -24,7 +55,6 @@ validator(hot_key: ByteArray) {
           RemoveMeta ->
             list.and(
               [
-                // no destination validation
                 // cornucopias must sign it
                 signing.verify_sig(tx, hot_key),
                 // single script input
@@ -35,16 +65,13 @@ validator(hot_key: ByteArray) {
             )
           // updates the metadata and change min ada
           UpdateMeta { lovelace, direction } -> {
-            let validating_value = validating_input.output.value
-            let increase_value = value.from_lovelace(lovelace)
             // set a direction to add or remove the minimum lovelace
             let cont_value =
-              when direction is {
-                // addition
-                0 -> value.add(validating_value, increase_value)
-                // subtract
-                _ -> value.add(validating_value, value.negate(increase_value))
-              }
+              add_or_subtract(
+                validating_input.output.value,
+                lovelace,
+                direction,
+              )
             list.and(
               [
                 // cornucopias must sign it

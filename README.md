@@ -245,3 +245,13 @@ The metadatumc an just be removed with this command:
 ```bash
 ./03_removeMetadata.sh
 ```
+
+## Testing
+
+The minting contracts use the [assist library](https://github.com/logicalmechanism/assist) which is a set of well tested functions for Aiken. This allows for most of the testing to be already completed.
+
+The tests can be ran with this command
+
+```bash
+aiken check
+```
