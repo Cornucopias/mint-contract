@@ -7,6 +7,9 @@ use assist/payout
 use assist/signing
 use mint_contract/types.{CIP68Datum, CIP68Redeemer, RemoveMeta, UpdateMeta}
 
+/// This adds or subtracts some amount of lovelace from a value. Adding is when
+/// the direction is zero, anything else is subtraction.
+///
 fn add_or_subtract(self: Value, lovelace: Int, direction: Int) -> Value {
   let lovelace_value = value.from_lovelace(lovelace)
   // set a direction to add or remove the minimum lovelace
@@ -62,10 +65,13 @@ validator(hot_key: ByteArray) {
             )
           // updates the metadata and change min ada
           UpdateMeta { lovelace, direction } -> {
-            let validating_value = validating_input.output.value
             // set a direction to add or remove the minimum lovelace
             let cont_value =
-              add_or_subtract(validating_value, lovelace, direction)
+              add_or_subtract(
+                validating_input.output.value,
+                lovelace,
+                direction,
+              )
             list.and(
               [
                 // cornucopias must sign it

@@ -21,7 +21,7 @@ validator(hot_key: ByteArray, cip68_hash_data: Data) {
     let first_index = find.first_input_index(tx.inputs)
     let first_tx_hash = find.first_input_txid(tx.inputs)
     // use the ref prefix
-    let reference_tkn =
+    let ref_tkn =
       values.unique_token_name(first_tx_hash, first_index, prefixes.prefix_100)
     // use the nft prefix
     let nft_tkn =
@@ -46,7 +46,7 @@ validator(hot_key: ByteArray, cip68_hash_data: Data) {
                 mint_validators.correct_mint(
                   mint,
                   own_currency_symbol,
-                  reference_tkn,
+                  ref_tkn,
                   1,
                 ),
                 // must mint 1 non-fungible token
@@ -59,7 +59,7 @@ validator(hot_key: ByteArray, cip68_hash_data: Data) {
                 // reference token must go to cip contract
                 payout.at_least(
                   cip68_addr,
-                  value.from_asset(own_currency_symbol, reference_tkn, 1),
+                  value.from_asset(own_currency_symbol, ref_tkn, 1),
                   tx.outputs,
                 ),
               ],
