@@ -1,7 +1,17 @@
 import hashlib
 import binascii
 
-def token_name(txHash, index, prefix):
+def token_name(txHash: str, index: int, prefix: str) -> str:
+    """
+    Given a tx hash, the index, and a prefix generate a unique token name.
+    
+    >>> token_name("1e637fd4b1a6a633261a1ba463577d65209dbbe0f7e8ec1fbfedb4c6b1bb926b", 1, "2831303029")
+    28313030290138c741df813afd1e2ba521d6b798dcabbc813ac7ba84467080b9
+    >>> token_name("1e637fd4b1a6a633261a1ba463577d65209dbbe0f7e8ec1fbfedb4c6b1bb926b", 1, "2833333329")
+    28333333290138c741df813afd1e2ba521d6b798dcabbc813ac7ba84467080b9
+    >>> token_name("", 0, "")
+    00a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f843
+    """
     txBytes = binascii.unhexlify(txHash)
     h = hashlib.new('sha3_256')
     h.update(txBytes)
@@ -13,13 +23,5 @@ def token_name(txHash, index, prefix):
     print(txHash[0:64])
 
 if __name__ == "__main__":
-    prefix_100 = "2831303029"
-    
-    prefix_333 = "2833333329"
-    
-    print('reference', token_name("1e637fd4b1a6a633261a1ba463577d65209dbbe0f7e8ec1fbfedb4c6b1bb926b", 1, prefix_100))
-    
-    print('fractions', token_name("1e637fd4b1a6a633261a1ba463577d65209dbbe0f7e8ec1fbfedb4c6b1bb926b", 1, prefix_333))
-    
-    
-    print('test', token_name("", 0, ""))
+    import doctest
+    doctest.testmod()

@@ -1,7 +1,7 @@
 import json
 from unittest.mock import mock_open, patch
 
-def int_obj(integer):
+def int_obj(integer: int) -> dict:
     """
     Creates the int object.
     
@@ -18,7 +18,7 @@ def int_obj(integer):
         raise ValueError("integer must non-negative")
     return {"int": integer}
 
-def to_hex(string):
+def to_hex(string: str) -> str:
     """
     Returns the hexencoded version of a string.
     
@@ -29,7 +29,7 @@ def to_hex(string):
     """
     return string.encode().hex()
 
-def byte_obj(string):
+def byte_obj(string: str) -> dict:
     """
     If the string is greater than the max length then it will return a list of
     byte objects else it will just be the bytes object.
@@ -51,7 +51,7 @@ def byte_obj(string):
         return {"list": list_object}
     return {"bytes": string}
 
-def dict_obj(data, key):
+def dict_obj(data: dict, key: str) -> dict:
     """
     >>> dict_obj({'a':{'b':0}}, 'a')
     {'map': [{'k': {'bytes': '62'}, 'v': {'int': 0}}]}
@@ -86,7 +86,7 @@ def dict_obj(data, key):
     return nested_map
 
 
-def list_obj(data, key):
+def list_obj(data: dict, key: str) -> dict:
     """
     >>> list_obj({'a':[0,1,2]}, 'a')
     {'k': {'bytes': '61'}, 'v': {'list': [{'int': 0}, {'int': 1}, {'int': 2}]}}
@@ -123,7 +123,7 @@ def list_obj(data, key):
     # list of lists?
     # TODO
 
-def read_metadata_file(file_path):
+def read_metadata_file(file_path: str) -> dict:
     """
     Load JSON from a file and return the data.
     
@@ -147,7 +147,7 @@ def read_metadata_file(file_path):
         # Handle the case when the file contains invalid JSON content
         raise ValueError("Invalid JSON content in the file.")
 
-def write_metadatum_file(file_path, data):
+def write_metadatum_file(file_path: str, data: dict):
     """
     JSON dump data into a file.
     """
@@ -155,7 +155,7 @@ def write_metadatum_file(file_path, data):
         json.dump(data, f)
 
 
-def create_metadatum(path, tag, pid, tkn, version):
+def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> dict:
     """
     Attempt to create a metadatum from a standard 
     """
@@ -206,7 +206,7 @@ def create_metadatum(path, tag, pid, tkn, version):
     return metadatum
 
 
-def convert_metadata(file_path, datum_path, tag, pid, tkn, version):
+def convert_metadata(file_path: str, datum_path: str, tag: str, pid: str, tkn: str, version: int):
     """
     Convert the metadata file into the correct metadatum format. This would
     probably be the function to call.
@@ -230,7 +230,7 @@ if __name__ == "__main__":
     version = 1
     convert_metadata(file_path, datum_path, tag, pid, tkn, version)
     
-    # real life newm 0 data
+    # real life newm_0 data
     file_path = "../data/meta/example.metadata2.json"
     datum_path = "../data/meta/example.metadatum2.json"
     tag = '721'
