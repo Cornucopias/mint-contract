@@ -10,7 +10,11 @@ use assist/values
 use mint_contract/mint_validators
 use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
 
-validator(hot_key: ByteArray, cip68_hash_data: Data) {
+validator(
+  hot_key: ByteArray,
+  cip68_hash_data: Data,
+  _random_string: ByteArray,
+) {
   fn params(redeemer: MintRedeemer, context: ScriptContext) -> Bool {
     // this transaction
     let tx = context.transaction

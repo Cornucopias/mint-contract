@@ -1,4 +1,6 @@
 {
   "__comment1__": "The hot key",
-  "hotKey": "8225e3fb2adefb8dd0e8c822c940c6696c7bea1e99609d2573c44127"
+  "hotKey": "8225e3fb2adefb8dd0e8c822c940c6696c7bea1e99609d2573c44127",
+  "__comment2__": "This allows many policies to be controlled by one hotkey",
+  "random": "acab"
 }
