@@ -26,7 +26,7 @@ With a fully syncd testnet node and correct node environment, we can view the ba
 
 ### Compile
 
-Inside the parent folder, there is a script called `complete_build.sh`. This script automates the compilation of the contracts using information from the `start_info.json` file. If the wallets have been prepared correctly, the compile script will automatically populate the starting information with the correct hotkey from the wallets folder. However, if the wallets are not prepped correctly, you will need to manually insert the public key hash of the hot wallet into the start_info.json file and comment out the auto populate.
+Inside the parent folder, there is a script called `complete_build.sh`. This script automates the compilation of the contracts using information from the `start_info.json` file. If the wallets have been prepared correctly, the compile script will automatically populate the starting information with the correct hotkey from the wallets folder. However, if the wallets are not prepped correctly, you will need to manually insert the public key hash of the hot wallet into the start_info.json file and comment out the auto populate function in the build script. One additional field exists in the starting information called `random`. It is a random hex string in the starting information for multi policy generation. This allows a single hot key to control many policies but its for advance use only and the default value is preferred.
 
 The contracts can be compiled with this command:
 
