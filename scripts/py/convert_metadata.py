@@ -12,10 +12,10 @@ def int_obj(integer: int) -> dict:
     >>> int_obj(-123)
     Traceback (most recent call last):
     ...
-    ValueError: integer must non-negative
+    ValueError: Integer must non-negative
     """
     if integer < 0:
-        raise ValueError("integer must non-negative")
+        raise ValueError("Integer must non-negative")
     return {"int": integer}
 
 def to_hex(string: str) -> str:
@@ -26,7 +26,13 @@ def to_hex(string: str) -> str:
     '48656c6c6f2c20776f726c6421'
     >>> to_hex('Python')
     '507974686f6e'
+    >>> to_hex(14)
+    Traceback (most recent call last):
+    ...
+    TypeError: Input must be a string
     """
+    if not isinstance(string, str):
+        raise TypeError("Input must be a string")
     return string.encode().hex()
 
 def byte_obj(string: str) -> dict:
@@ -44,15 +50,27 @@ def byte_obj(string: str) -> dict:
     # if string is longer than accepted length then create list of strings
     max_length = 128
     if len(string) > max_length:
+        # split string into length 128 segments
         string_list = [string[i:i+max_length] for i in range(0, len(string), max_length)]
         list_object = []
+        
+        # loop all length 128 strings
         for value in string_list:
             list_object.append({"bytes": value})
+        
+        # list of byte objects
         return {"list": list_object}
+    
+    # simple byte object
     return {"bytes": string}
 
 def dict_obj(data: dict, key: str) -> dict:
     """
+    This creates the dictionary object.
+    >>> dict_obj({}, '')
+    {'map': []}
+    >>> dict_obj({'':{}}, '')
+    {'map': []}
     >>> dict_obj({'a':{'b':0}}, 'a')
     {'map': [{'k': {'bytes': '62'}, 'v': {'int': 0}}]}
     >>> dict_obj({'a':{'b':'a'}}, 'a')
@@ -66,6 +84,14 @@ def dict_obj(data: dict, key: str) -> dict:
     """
     # dict conversion
     nested_map = {"map":[]}
+    try:
+        data[key]
+        if not data[key]:
+            return nested_map
+    except KeyError:
+        return nested_map
+    
+    # loop all the nested keys
     for nested_key in data[key]:
         # dict of strings
         if isinstance(data[key][nested_key], str):
@@ -82,18 +108,29 @@ def dict_obj(data: dict, key: str) -> dict:
         # dict of dicts
         elif isinstance(data[key][nested_key], dict):
             nested_map["map"].append({"k": byte_obj(to_hex(nested_key)), "v":dict_obj(data[key], nested_key)})
-            
+        
+        # something that isnt the standard types
+        else:
+            raise TypeError("Forbidden Plutus Type")            
     return nested_map
+
+
 
 
 def list_obj(data: dict, key: str) -> dict:
     """
+    This creates the list object.
+    
     >>> list_obj({'a':[0,1,2]}, 'a')
     {'k': {'bytes': '61'}, 'v': {'list': [{'int': 0}, {'int': 1}, {'int': 2}]}}
     >>> list_obj({'a':['0','1','2']}, 'a')
     {'k': {'bytes': '61'}, 'v': {'list': [{'bytes': '30'}, {'bytes': '31'}, {'bytes': '32'}]}}
     >>> list_obj({'a':[{'a':'0'},{'b':'1'}]}, 'a')
     {'k': {'bytes': '61'}, 'v': {'list': [{'map': [{'k': {'bytes': '61'}, 'v': {'bytes': '30'}}]}, {'map': [{'k': {'bytes': '62'}, 'v': {'bytes': '31'}}]}]}}
+    >>> list_obj({'a':[[1,3,5],[2,4,6]]}, 'a')
+    {'k': {'bytes': '61'}, 'v': {'list': [{'list': [{'int': 1}, {'int': 3}, {'int': 5}]}, {'list': [{'int': 2}, {'int': 4}, {'int': 6}]}]}}
+    >>> list_obj({'a':[[[1,3,5],[2,4,6]],[[7,9,11],[8,10,12]]]}, 'a')
+    {'k': {'bytes': '61'}, 'v': {'list': [{'list': [{'list': [{'int': 1}, {'int': 3}, {'int': 5}]}, {'list': [{'int': 2}, {'int': 4}, {'int': 6}]}]}, {'list': [{'list': [{'int': 7}, {'int': 9}, {'int': 11}]}, {'list': [{'int': 8}, {'int': 10}, {'int': 12}]}]}]}}
     """
     # default it to the empty list object
     if len(data[key]) == 0:
@@ -120,8 +157,18 @@ def list_obj(data: dict, key: str) -> dict:
             list_object.append({"int": value})
         return {"k": byte_obj(to_hex(key)),"v":{"list": list_object}}
     
-    # list of lists?
-    # TODO
+    elif isinstance(data[key][0], list):
+        list_object = []
+        
+        # loop all the lists in the list
+        for l in data[key]:
+            list_object.append(list_obj({'':l},'')['v'])
+        return {"k": byte_obj(to_hex(key)),"v":{"list": list_object}}
+
+    #  something that isnt the standard types
+    else:
+        raise TypeError("Forbidden Plutus Type") 
+        
 
 def read_metadata_file(file_path: str) -> dict:
     """
@@ -150,22 +197,41 @@ def read_metadata_file(file_path: str) -> dict:
 def write_metadatum_file(file_path: str, data: dict):
     """
     JSON dump data into a file.
+    
+    >>> write_metadatum_file("example.json", {"key": "value"})
+    >>> # No exception should be raised if the file write and serialization are successful.
+
+    >>> write_metadatum_file("/nonexistent/example.json", {"key": "value"})
+    Traceback (most recent call last):
+    ...
+    OSError: Error Writing File
+
+    >>> write_metadatum_file("example.json", {"key": set()})
+    Traceback (most recent call last):
+        ...
+    TypeError: Error serializing data type
+
     """
-    with open(file_path, "w") as f:
-        json.dump(data, f)
+    try:
+        with open(file_path, "w") as f:
+            json.dump(data, f)
+    except OSError:
+        raise OSError("Error Writing File")
+    except TypeError:
+        raise TypeError("Error serializing data type")
 
 
 def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> dict:
     """
-    Attempt to create a metadatum from a standard 
+    Attempt to create a metadatum from a standard 721 metadata file.
     """
     metadatum = {
         "constructor": 0,
         "fields": []
     }
     
-    version_object = {"int": version}
-    map_object = {"map":[]}
+    version_object = int_obj(version)
+    map_object = dict_obj({}, '')
     
     data = read_metadata_file(path)
     
@@ -197,7 +263,7 @@ def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> d
         
         # catch whatever
         else:
-            raise TypeError("Something that is not a str, int, list, or dict")
+            raise TypeError("Forbidden Plutus Type") 
             
     # add the fields to the metadatum
     metadatum['fields'].append(map_object)
