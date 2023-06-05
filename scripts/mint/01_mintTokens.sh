@@ -49,8 +49,8 @@ IFS='#' read -ra array <<< "$string"
 prefix_100="2831303029"
 prefix_222="2832323229"
 
-ref_name=$(python3 -c "import sys; sys.path.append('../py/'); from getTokenName import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_100}')")
-nft_name=$(python3 -c "import sys; sys.path.append('../py/'); from getTokenName import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_222}')")
+ref_name=$(python3 -c "import sys; sys.path.append('../py/'); from get_token_name import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_100}')")
+nft_name=$(python3 -c "import sys; sys.path.append('../py/'); from get_token_name import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_222}')")
 
 echo -n $ref_name > ../tmp/ref.token
 echo -n $nft_name > ../tmp/nft.token

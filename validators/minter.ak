@@ -20,6 +20,7 @@ validator(
     let tx = context.transaction
     // cip68 address know at compile time
     expect cip68_hash: ByteArray = cip68_hash_data
+    // no staking at this address
     let cip68_addr = credential.from_script(cip68_hash)
     // get first tx info
     let first_index = find.first_input_index(tx.inputs)
@@ -30,10 +31,12 @@ validator(
     // use the nft prefix
     let nft_tkn =
       values.unique_token_name(first_tx_hash, first_index, prefixes.prefix_222)
+    // the minted value from the tx
     let mint =
       tx.mint
         |> value.without_lovelace()
         |> value.flatten()
+    // MINT ONLY
     when context.purpose is {
       // Mint 1 ref and 1 nft
       Mint(own_currency_symbol) ->
@@ -42,7 +45,7 @@ validator(
           MintTokens ->
             list.and(
               [
-                // hot key must sign
+                // cornucopias must sign it
                 signing.verify_sig(tx, hot_key),
                 // prevent roll over double nft attack
                 first_index < 256,
@@ -72,7 +75,7 @@ validator(
           BurnTokens ->
             list.and(
               [
-                // hot key must sign
+                // cornucopias must sign it
                 signing.verify_sig(tx, hot_key),
                 // the or allows the option
                 list.or(
@@ -96,7 +99,7 @@ validator(
               ],
             )
         }
-      // Minting Only
+      // Mint Only
       _ -> False
     }
   }

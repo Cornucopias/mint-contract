@@ -14,8 +14,10 @@ def int_obj(integer: int) -> dict:
     ...
     ValueError: Integer must non-negative
     """
+    # positive integers
     if integer < 0:
         raise ValueError("Integer must non-negative")
+    
     return {"int": integer}
 
 def to_hex(string: str) -> str:
@@ -31,8 +33,10 @@ def to_hex(string: str) -> str:
     ...
     TypeError: Input must be a string
     """
+    # string only
     if not isinstance(string, str):
         raise TypeError("Input must be a string")
+    
     return string.encode().hex()
 
 def byte_obj(string: str) -> dict:
@@ -50,6 +54,7 @@ def byte_obj(string: str) -> dict:
     # if string is longer than accepted length then create list of strings
     max_length = 128
     if len(string) > max_length:
+        
         # split string into length 128 segments
         string_list = [string[i:i+max_length] for i in range(0, len(string), max_length)]
         list_object = []
@@ -83,11 +88,17 @@ def dict_obj(data: dict, key: str) -> dict:
     {'map': [{'k': {'bytes': '62'}, 'v': {'map': [{'k': {'bytes': '63'}, 'v': {'map': [{'k': {'bytes': '64'}, 'v': {'int': 0}}]}}]}}]}
     """
     # dict conversion
-    nested_map = {"map":[]}
+    nested_map = {"map": []}
+    
+    # test for a valid dictionary input
     try:
         data[key]
+        
+        # if its empty return empty
         if not data[key]:
             return nested_map
+    
+    # if it doesn't exist return empty
     except KeyError:
         return nested_map
     
@@ -95,11 +106,11 @@ def dict_obj(data: dict, key: str) -> dict:
     for nested_key in data[key]:
         # dict of strings
         if isinstance(data[key][nested_key], str):
-            nested_map["map"].append({"k": byte_obj(to_hex(nested_key)), "v":byte_obj(to_hex(data[key][nested_key]))})
+            nested_map["map"].append({"k": byte_obj(to_hex(nested_key)), "v": byte_obj(to_hex(data[key][nested_key]))})
 
         # dict of ints
         elif isinstance(data[key][nested_key], int):
-            nested_map["map"].append({"k": byte_obj(to_hex(nested_key)), "v":int_obj(data[key][nested_key])})
+            nested_map["map"].append({"k": byte_obj(to_hex(nested_key)), "v": int_obj(data[key][nested_key])})
         
         # dict of lists
         elif isinstance(data[key][nested_key], list):
@@ -107,15 +118,12 @@ def dict_obj(data: dict, key: str) -> dict:
         
         # dict of dicts
         elif isinstance(data[key][nested_key], dict):
-            nested_map["map"].append({"k": byte_obj(to_hex(nested_key)), "v":dict_obj(data[key], nested_key)})
+            nested_map["map"].append({"k": byte_obj(to_hex(nested_key)), "v": dict_obj(data[key], nested_key)})
         
         # something that isnt the standard types
         else:
             raise TypeError("Forbidden Plutus Type")            
     return nested_map
-
-
-
 
 def list_obj(data: dict, key: str) -> dict:
     """
@@ -134,42 +142,42 @@ def list_obj(data: dict, key: str) -> dict:
     """
     # default it to the empty list object
     if len(data[key]) == 0:
-        return {"k": byte_obj(to_hex(key)),"v":{"list": []}}
+        return {"k": byte_obj(to_hex(key)),"v": {"list": []}}
     
     # list of dicts
     elif isinstance(data[key][0], dict):
         list_of_dicts = []
         for i, value in enumerate(data[key]):
             list_of_dicts.append(dict_obj(data[key], i))
-        return {"k": byte_obj(to_hex(key)),"v":{"list": list_of_dicts}}
+        return {"k": byte_obj(to_hex(key)),"v": {"list": list_of_dicts}}
         
     # list of strings
     elif isinstance(data[key][0], str):
         list_object = []
         for value in data[key]:
             list_object.append({"bytes": to_hex(value)})
-        return {"k": byte_obj(to_hex(key)),"v":{"list": list_object}}
+        return {"k": byte_obj(to_hex(key)),"v": {"list": list_object}}
     
     # list of ints
     elif isinstance(data[key][0], int):
         list_object = []
         for value in data[key]:
             list_object.append({"int": value})
-        return {"k": byte_obj(to_hex(key)),"v":{"list": list_object}}
+        return {"k": byte_obj(to_hex(key)),"v": {"list": list_object}}
     
+    # list of lists
     elif isinstance(data[key][0], list):
         list_object = []
         
         # loop all the lists in the list
         for l in data[key]:
             list_object.append(list_obj({'':l},'')['v'])
-        return {"k": byte_obj(to_hex(key)),"v":{"list": list_object}}
+        return {"k": byte_obj(to_hex(key)),"v": {"list": list_object}}
 
-    #  something that isnt the standard types
+    # catch whatever else
     else:
         raise TypeError("Forbidden Plutus Type") 
         
-
 def read_metadata_file(file_path: str) -> dict:
     """
     Load JSON from a file and return the data.
@@ -183,18 +191,21 @@ def read_metadata_file(file_path: str) -> dict:
     ...
     ValueError: Invalid JSON content in the file.
     """
+    # attempt file read
     try:
         with open(file_path) as f:
             data = json.load(f)
         return data
+    
+    # Handle the case when the file does not exist
     except FileNotFoundError:
-        # Handle the case when the file does not exist
         raise
+    
+    # Handle the case when the file contains invalid JSON content
     except json.JSONDecodeError:
-        # Handle the case when the file contains invalid JSON content
         raise ValueError("Invalid JSON content in the file.")
 
-def write_metadatum_file(file_path: str, data: dict):
+def write_metadatum_file(file_path: str, data: dict) -> None:
     """
     JSON dump data into a file.
     
@@ -212,33 +223,54 @@ def write_metadatum_file(file_path: str, data: dict):
     TypeError: Error serializing data type
 
     """
+    # attempt file write
     try:
         with open(file_path, "w") as f:
             json.dump(data, f)
+    
+    # file path doesn't exist
     except OSError:
         raise OSError("Error Writing File")
+    
+    # data is bad
     except TypeError:
         raise TypeError("Error serializing data type")
-
 
 def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> dict:
     """
     Attempt to create a metadatum from a standard 721 metadata file.
+    
+    >>> file_path = "../data/meta/empty.metadata.json"
+    >>> tag = '721'
+    >>> pid = 'policy_id'
+    >>> tkn = 'token_name'
+    >>> version = 1
+    >>> create_metadatum(file_path, tag, pid, tkn, version)
+    {'constructor': 0, 'fields': [{'map': []}, {'int': 1}]}
+    
+    >>> file_path = "../data/meta/example.metadata3.json"
+    >>> create_metadatum(file_path, tag, pid, tkn, version)
+    {'constructor': 0, 'fields': [{'map': [{'k': {'bytes': '616c62756d5f7469746c65'}, 'v': {'bytes': '4120536f6e67'}}, {'k': {'bytes': '61727469737473'}, 'v': {'list': [{'map': [{'k': {'bytes': '6e616d65'}, 'v': {'bytes': '596f75'}}]}]}}, {'k': {'bytes': '636f70797269676874'}, 'v': {'list': [{'bytes': 'c2a920323032322046616b65204c4c43'}]}}, {'k': {'bytes': '636f756e7472795f6f665f6f726967696e'}, 'v': {'bytes': '556e6974656420537461746573'}}, {'k': {'bytes': '747261636b5f6e756d626572'}, 'v': {'int': 1}}]}, {'int': 1}]}
     """
+    # parent structure
     metadatum = {
         "constructor": 0,
         "fields": []
     }
     
+    # set up default values
     version_object = int_obj(version)
     map_object = dict_obj({}, '')
     
+    # get the data
     data = read_metadata_file(path)
     
+    # attempt to find the metadata
     try:
         metadata = data[tag][pid][tkn]
+    
+    # return the empty metadatum if we can't find it
     except KeyError:
-        # return the empty metadatum
         metadatum['fields'].append(map_object)
         metadatum['fields'].append(version_object)
         return metadatum
@@ -247,11 +279,11 @@ def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> d
     for key in metadata:
         # string conversion
         if isinstance(metadata[key], str):
-            map_object["map"].append({"k": byte_obj(to_hex(key)), "v":byte_obj(to_hex(metadata[key]))})
+            map_object["map"].append({"k": byte_obj(to_hex(key)), "v": byte_obj(to_hex(metadata[key]))})
 
         # int conversion
         elif isinstance(metadata[key], int):
-            map_object["map"].append({"k": byte_obj(to_hex(key)), "v":int_obj(metadata[key])})
+            map_object["map"].append({"k": byte_obj(to_hex(key)), "v": int_obj(metadata[key])})
         
         # list conversion
         elif isinstance(metadata[key], list):
@@ -259,9 +291,9 @@ def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> d
 
         # dict conversion
         elif isinstance(metadata[key], dict):
-            map_object["map"].append({"k": byte_obj(to_hex(key)),"v":dict_obj(metadata, key)})
+            map_object["map"].append({"k": byte_obj(to_hex(key)),"v": dict_obj(metadata, key)})
         
-        # catch whatever
+        # catch whatever is left
         else:
             raise TypeError("Forbidden Plutus Type") 
             
@@ -271,46 +303,22 @@ def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> d
     
     return metadatum
 
-
-def convert_metadata(file_path: str, datum_path: str, tag: str, pid: str, tkn: str, version: int):
+def convert_metadata(file_path: str, datum_path: str, tag: str, pid: str, tkn: str, version: int) -> None:
     """
     Convert the metadata file into the correct metadatum format. This would
     probably be the function to call.
+    
+    >>> file_path = "../data/meta/example.metadata4.json"
+    >>> datum_path = "../data/meta/example.metadatum4.json"
+    >>> tag = '721'
+    >>> pid = 'policy_id'
+    >>> tkn = 'token_name'
+    >>> version = 1
+    >>> convert_metadata(file_path, datum_path, tag, pid, tkn, version)
     """
     datum = create_metadatum(file_path, tag, pid, tkn, version)
     write_metadatum_file(datum_path, datum)
 
-
-
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-    
-    
-    # made up data
-    file_path = "../data/meta/example.metadata.json"
-    datum_path = "../data/meta/example.metadatum.json"
-    tag = '721'
-    pid = '<policy_id_hex>'
-    tkn = '<asset_name_ascii>'
-    version = 1
-    convert_metadata(file_path, datum_path, tag, pid, tkn, version)
-    
-    # real life newm_0 data
-    file_path = "../data/meta/example.metadata2.json"
-    datum_path = "../data/meta/example.metadatum2.json"
-    tag = '721'
-    pid = '46e607b3046a34c95e7c29e47047618dbf5e10de777ba56c590cfd5c'
-    tkn = 'NEWM_0'
-    version = 1
-    convert_metadata(file_path, datum_path, tag, pid, tkn, version)
-    
-    # simple fake data
-    file_path = "../data/meta/example.metadata3.json"
-    datum_path = "../data/meta/example.metadatum3.json"
-    tag = '721'
-    pid = 'policy_id'
-    tkn = 'token_name'
-    version = 1
-    convert_metadata(file_path, datum_path, tag, pid, tkn, version)
-   

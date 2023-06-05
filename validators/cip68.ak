@@ -46,9 +46,12 @@ validator(hot_key: ByteArray) {
   ) -> Bool {
     // the transaction being validated
     let tx = context.transaction
+    // SPEND ONLY
     when context.purpose is {
       Spend(output_reference) -> {
+        // this is the input being validated
         let validating_input = find.input_by_ref(tx.inputs, output_reference)
+        // this script address
         let script_addr = validating_input.output.address
         when redeemer is {
           // removes the utxo entirely from the contract
@@ -87,7 +90,7 @@ validator(hot_key: ByteArray) {
           }
         }
       }
-      // Spending Only
+      // Spend Only
       _ -> False
     }
   }
