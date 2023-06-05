@@ -283,7 +283,7 @@ def create_metadatum(path: str, tag: str, pid: str, tkn: str, version: int) -> d
     >>> create_metadatum(file_path, tag, pid, tkn, version)
     {'constructor': 0, 'fields': [{'map': []}, {'int': 1}]}
 
-    >>> file_path = "../data/meta/example.metadata3.json"
+    >>> file_path = "../data/meta/readme.metadata.json"
     >>> create_metadatum(file_path, tag, pid, tkn, version)
     {'constructor': 0, 'fields': [{'map': [{'k': {'bytes': '616c62756d5f7469746c65'}, 'v': {'bytes': '4120536f6e67'}}, {'k': {'bytes': '61727469737473'}, 'v': {'list': [{'map': [{'k': {'bytes': '6e616d65'}, 'v': {'bytes': '596f75'}}]}]}}, {'k': {'bytes': '636f70797269676874'}, 'v': {'list': [{'bytes': 'c2a920323032322046616b65204c4c43'}]}}, {'k': {'bytes': '636f756e7472795f6f665f6f726967696e'}, 'v': {'bytes': '556e6974656420537461746573'}}, {'k': {'bytes': '747261636b5f6e756d626572'}, 'v': {'int': 1}}]}, {'int': 1}]}
     """
@@ -347,8 +347,8 @@ def convert_metadata(file_path: str, datum_path: str, tag: str, pid: str, tkn: s
     Convert the metadata file into the correct metadatum format. This would
     probably be the function to call.
 
-    >>> file_path = "../data/meta/example.metadata4.json"
-    >>> datum_path = "../data/meta/example.metadatum4.json"
+    >>> file_path = "../data/meta/test.metadata.json"
+    >>> datum_path = "../data/meta/test.metadatum.json"
     >>> tag = '721'
     >>> pid = 'policy_id'
     >>> tkn = 'token_name'
@@ -362,3 +362,4 @@ def convert_metadata(file_path: str, datum_path: str, tag: str, pid: str, tkn: s
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+    
