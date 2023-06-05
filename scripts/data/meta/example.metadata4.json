@@ -55,7 +55,8 @@
         "list_dict_list_dict": [
           {"element_1":[{"nested_1": 1}]},
           {"element_2":[{"nested_2": 2}]}
-        ]
+        ],
+        "This is a very long string for testing things for the key obj testing that is longer than the max length": 0
       }
     },
     "version": 1
