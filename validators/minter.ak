@@ -77,7 +77,7 @@ validator(
               [
                 // cornucopias must sign it
                 signing.verify_sig(tx, hot_key),
-                // the or allows the option
+                // the or allows the optionional burning
                 list.or(
                   [
                     // burn only 1 ref token

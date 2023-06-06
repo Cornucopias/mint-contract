@@ -60,7 +60,7 @@
     },
     "mint_contract/types/CIP68Datum": {
       "title": "CIP68Datum",
-      "description": "The proposed CIP68 datum standard https://cips.cardano.org/cips/cip68/",
+      "description": "The proposed CIP68 datum standard https://cips.cardano.org/cips/cip68/.",
       "anyOf": [
         {
           "title": "CIP68Datum",

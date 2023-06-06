@@ -8,6 +8,10 @@ Let's assume that the purchaser of the token intends to provide the minimum ADA 
 
 The `scripts` folder is specifically designed to facilitate a quick setup for the happy path.
 
+To begin interacting with the contracts on the testnet, let's navigate back to the scripts folder and update the files inside the `scripts/data` folder to match the current local environment. Within the data directory, you'll find the following files: `path_to_cli.sh`, `path_to_socket.sh`, and `testnet.magic`. Update these files with the appropriate information for the local environment. If the `cardano-cli` exists on path then the cli path file does not need to change. The pre-prod testnet magic is 1, preview is 2. The path to socket file needs to point directly to the socket file.
+
+The node environment files will need to be set up before any of the scripts will work.
+
 ### Wallets
 
 To facilitate the setup process, it is necessary to have a folder named `wallets` within the scripts directory. This folder will be used for creating the testnet wallets.
@@ -36,9 +40,7 @@ The contracts can be compiled with this command:
 
 Once the complete_build.sh script is executed, it will create two folders inside the parent directory: `contracts` and `hashes`. These folders will be used to store the compiled contracts and their corresponding hashes, respectively. At this stage, the scripts are successfully compiled and ready to be used.
 
-### Script References
-
-To begin interacting with the contracts on the testnet, let's navigate back to the scripts folder and update the `scripts/data` folder to match the current node environment. Within the data directory, you'll find the following files: `path_to_cli.sh`, `path_to_socket.sh`, and `testnet.magic`. Update these files with the appropriate information for the current node environment.
+## Scripts
 
 To organize the execution of scripts on the happy path, each script is prefixed with an integer to indicate the sequence of actions. With the environment correctly set up, we can create the reference scripts that store the contract data on-chain. To streamline the process, I suggest opening one terminal within the scripts folder, another within the `scripts/mint` folder, and a third terminal within the `scripts/cip68` folder. This way, one terminal can be used for balance checking, another for minting, and the third for metadatum operations.
 

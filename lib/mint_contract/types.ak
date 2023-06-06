@@ -1,6 +1,6 @@
 use aiken/dict.{Dict}
 
-/// The proposed CIP68 datum standard https://cips.cardano.org/cips/cip68/
+/// The proposed CIP68 datum standard https://cips.cardano.org/cips/cip68/.
 /// 
 pub type CIP68Datum {
   metadata: Dict<Data, Data>,
