@@ -36,6 +36,7 @@ if [ "${TXNS}" -eq "0" ]; then
    exit;
 fi
 alltxin=""
+# this should account for the specific token and ada?
 TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' ../tmp/receiver_utxo.json)
 receiver_tx_in=${TXIN::-8}
 
