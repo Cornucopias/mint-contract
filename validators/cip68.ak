@@ -15,9 +15,9 @@ fn add_or_subtract(self: Value, lovelace: Int, direction: Int) -> Value {
   // set a direction to add or remove the minimum lovelace
   when direction is {
     // addition
-    0 -> value.add(self, lovelace_value)
+    0 -> value.merge(self, lovelace_value)
     // subtract
-    _ -> value.add(self, value.negate(lovelace_value))
+    _ -> value.merge(self, value.negate(lovelace_value))
   }
 }
 

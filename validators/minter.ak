@@ -17,19 +17,14 @@ validator(
 ) {
   fn params(redeemer: MintRedeemer, context: ScriptContext) -> Bool {
     // this transaction
-    let tx =
-      context.transaction
+    let tx = context.transaction
     // cip68 address know at compile time
-    expect cip68_hash: ByteArray =
-      cip68_hash_data
+    expect cip68_hash: ByteArray = cip68_hash_data
     // no staking at this address
-    let cip68_addr =
-      credential.from_script(cip68_hash)
+    let cip68_addr = credential.from_script(cip68_hash)
     // get first tx info
-    let first_index =
-      find.first_input_index(tx.inputs)
-    let first_tx_hash =
-      find.first_input_txid(tx.inputs)
+    let first_index = find.first_input_index(tx.inputs)
+    let first_tx_hash = find.first_input_txid(tx.inputs)
     // use the ref prefix
     let ref_tkn =
       values.unique_token_name(first_tx_hash, first_index, prefixes.prefix_100)
@@ -39,7 +34,7 @@ validator(
     // the minted value from the tx
     let mint =
       tx.mint
-        |> value.without_lovelace()
+        |> value.from_minted_value()
         |> value.flatten()
     // MINT ONLY
     when context.purpose is {
@@ -51,7 +46,7 @@ validator(
             list.and(
               [
                 // cornucopias must sign it
-                signing.verify_sig(tx, hot_key)?,
+                signing.verify_sig(tx, hot_key),
                 // prevent roll over double nft attack
                 first_index < 256,
                 // must mint 1 reference token
@@ -60,20 +55,20 @@ validator(
                   own_currency_symbol,
                   ref_tkn,
                   1,
-                )?,
+                ),
                 // must mint 1 non-fungible token
                 mint_validators.correct_mint(
                   mint,
                   own_currency_symbol,
                   nft_tkn,
                   1,
-                )?,
+                ),
                 // reference token must go to cip contract
                 payout.at_least(
                   cip68_addr,
                   value.from_asset(own_currency_symbol, ref_tkn, 1),
                   tx.outputs,
-                )?,
+                ),
               ],
             )
           // can burn the ref or the nft or both at the same time
@@ -105,8 +100,7 @@ validator(
             )
         }
       // Mint Only
-      _ ->
-        False
+      _ -> False
     }
   }
 }
