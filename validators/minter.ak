@@ -46,7 +46,7 @@ validator(
             list.and(
               [
                 // cornucopias must sign it
-                signing.verify_sig(tx, hot_key),
+                signing.verify_sig(tx.extra_signatories, hot_key),
                 // prevent roll over double nft attack
                 first_index < 256,
                 // must mint 1 reference token
@@ -76,7 +76,7 @@ validator(
             list.and(
               [
                 // cornucopias must sign it
-                signing.verify_sig(tx, hot_key),
+                signing.verify_sig(tx.extra_signatories, hot_key),
                 // the or allows the optionional burning
                 list.or(
                   [

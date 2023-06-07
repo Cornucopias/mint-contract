@@ -59,7 +59,7 @@ validator(hot_key: ByteArray) {
             list.and(
               [
                 // cornucopias must sign it
-                signing.verify_sig(tx, hot_key),
+                signing.verify_sig(tx.extra_signatories, hot_key),
                 // single script input
                 count.inputs_by_addr(tx.inputs, script_addr, 1),
                 // no script output
@@ -78,7 +78,7 @@ validator(hot_key: ByteArray) {
             list.and(
               [
                 // cornucopias must sign it
-                signing.verify_sig(tx, hot_key),
+                signing.verify_sig(tx.extra_signatories, hot_key),
                 // single script input
                 count.inputs_by_addr(tx.inputs, script_addr, 1),
                 // single script output
