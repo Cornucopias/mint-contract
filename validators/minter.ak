@@ -10,12 +10,17 @@ use assist/values
 use mint_contract/mint_validators
 use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
 
-validator(hot_key: ByteArray, cip68_hash_data: Data) {
+validator(
+  hot_key: ByteArray,
+  cip68_hash_data: Data,
+  _random_string: ByteArray,
+) {
   fn params(redeemer: MintRedeemer, context: ScriptContext) -> Bool {
     // this transaction
     let tx = context.transaction
     // cip68 address know at compile time
     expect cip68_hash: ByteArray = cip68_hash_data
+    // no staking at this address
     let cip68_addr = credential.from_script(cip68_hash)
     // get first tx info
     let first_index = find.first_input_index(tx.inputs)
@@ -26,10 +31,12 @@ validator(hot_key: ByteArray, cip68_hash_data: Data) {
     // use the nft prefix
     let nft_tkn =
       values.unique_token_name(first_tx_hash, first_index, prefixes.prefix_222)
+    // the minted value from the tx
     let mint =
       tx.mint
-        |> value.without_lovelace()
+        |> value.from_minted_value()
         |> value.flatten()
+    // MINT ONLY
     when context.purpose is {
       // Mint 1 ref and 1 nft
       Mint(own_currency_symbol) ->
@@ -38,8 +45,8 @@ validator(hot_key: ByteArray, cip68_hash_data: Data) {
           MintTokens ->
             list.and(
               [
-                // hot key must sign
-                signing.verify_sig(tx, hot_key),
+                // cornucopias must sign it
+                signing.verify_sig(tx.extra_signatories, hot_key),
                 // prevent roll over double nft attack
                 first_index < 256,
                 // must mint 1 reference token
@@ -68,9 +75,9 @@ validator(hot_key: ByteArray, cip68_hash_data: Data) {
           BurnTokens ->
             list.and(
               [
-                // hot key must sign
-                signing.verify_sig(tx, hot_key),
-                // the or allows the option
+                // cornucopias must sign it
+                signing.verify_sig(tx.extra_signatories, hot_key),
+                // the or allows the optionional burning
                 list.or(
                   [
                     // burn only 1 ref token
@@ -92,7 +99,7 @@ validator(hot_key: ByteArray, cip68_hash_data: Data) {
               ],
             )
         }
-      // Minting Only
+      // Mint Only
       _ -> False
     }
   }

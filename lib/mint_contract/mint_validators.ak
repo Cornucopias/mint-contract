@@ -21,22 +21,26 @@ pub fn correct_mint(
         correct_mint(rest, pid, tkn, amt)
       }
     // something wasn't found
-    [] -> False
+    [] ->
+      False
   }
 }
 
 test good_mint() {
-  let mint = value.from_asset(#"acab", #"beef", 1) |> value.flatten()
+  let mint =
+    value.from_asset(#"acab", #"beef", 1) |> value.flatten()
   correct_mint(mint, #"acab", #"beef", 1) == True
 }
 
 test bad_mint() {
-  let mint = value.from_asset(#"acab", #"beef", 1) |> value.flatten()
+  let mint =
+    value.from_asset(#"acab", #"beef", 1) |> value.flatten()
   correct_mint(mint, #"acab", #"face", 1) == False
 }
 
 test empty_mint() {
-  let mint = value.zero() |> value.flatten
+  let mint =
+    value.zero() |> value.flatten
   correct_mint(mint, #"", #"", 0) == False
 }
 
@@ -54,7 +58,8 @@ pub fn correct_burn(
   when mint is {
     [(policy, token_name, quantity), ..rest] -> {
       // all cip68 prefixes have the same length
-      let p = bytearray.take(token_name, 5)
+      let p =
+        bytearray.take(token_name, 5)
       if list.and([policy == pid, prefix == p, quantity == amt]) == True {
         True
       } else {
@@ -62,7 +67,8 @@ pub fn correct_burn(
       }
     }
     // something wasn't found
-    [] -> False
+    [] ->
+      False
   }
 }
 
@@ -79,6 +85,7 @@ test bad_burn() {
 }
 
 test empty_burn() {
-  let mint = value.zero() |> value.flatten()
+  let mint =
+    value.zero() |> value.flatten()
   correct_burn(mint, #"acab", prefixes.prefix_222, -1) == False
 }

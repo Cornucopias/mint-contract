@@ -15,9 +15,9 @@ fn add_or_subtract(self: Value, lovelace: Int, direction: Int) -> Value {
   // set a direction to add or remove the minimum lovelace
   when direction is {
     // addition
-    0 -> value.add(self, lovelace_value)
+    0 -> value.merge(self, lovelace_value)
     // subtract
-    _ -> value.add(self, value.negate(lovelace_value))
+    _ -> value.merge(self, value.negate(lovelace_value))
   }
 }
 
@@ -46,9 +46,12 @@ validator(hot_key: ByteArray) {
   ) -> Bool {
     // the transaction being validated
     let tx = context.transaction
+    // SPEND ONLY
     when context.purpose is {
       Spend(output_reference) -> {
+        // this is the input being validated
         let validating_input = find.input_by_ref(tx.inputs, output_reference)
+        // this script address
         let script_addr = validating_input.output.address
         when redeemer is {
           // removes the utxo entirely from the contract
@@ -56,7 +59,7 @@ validator(hot_key: ByteArray) {
             list.and(
               [
                 // cornucopias must sign it
-                signing.verify_sig(tx, hot_key),
+                signing.verify_sig(tx.extra_signatories, hot_key),
                 // single script input
                 count.inputs_by_addr(tx.inputs, script_addr, 1),
                 // no script output
@@ -75,7 +78,7 @@ validator(hot_key: ByteArray) {
             list.and(
               [
                 // cornucopias must sign it
-                signing.verify_sig(tx, hot_key),
+                signing.verify_sig(tx.extra_signatories, hot_key),
                 // single script input
                 count.inputs_by_addr(tx.inputs, script_addr, 1),
                 // single script output
@@ -87,7 +90,7 @@ validator(hot_key: ByteArray) {
           }
         }
       }
-      // Spending Only
+      // Spend Only
       _ -> False
     }
   }

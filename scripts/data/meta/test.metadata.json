@@ -1,0 +1,64 @@
+{
+  "721": {
+    "policy_id": {
+      "token_name": {
+        "simple_str": "test_string",
+        "simple_int": 123,
+        "empty_list": [],
+        "simple_int_list": [1, 2, 3],
+        "simple_str_list": ["a", "b", "c"],
+        "simple_dict_list": [
+          {
+            "element_1": "one"
+          },
+          {
+            "element_2": "two"
+          }
+        ],
+        "simple_list_list": [
+          [3, 2, 1],
+          ["c", "b", "a"]
+        ],
+        "empty_dict": {},
+        "simple_int_dict": {
+          "element_1": 1,
+          "element_2": 2,
+          "element_3": 3
+        },
+        "simple_str_dict": {
+          "element_1": "1",
+          "element_2": "2",
+          "element_3": "3"
+        },
+        "simple_int_dict_dict": {
+          "element_1": {"nested_1": 1},
+          "element_2": {"nested_2": 2},
+          "element_3": {"nested_3": 3}
+        },
+        "simple_str_dict_dict": {
+          "element_1": {"nested_1": "a"},
+          "element_2": {"nested_2": "b"},
+          "element_3": {"nested_3": "c"}
+        },
+        "simple_list_dict": {
+          "element_1": [1, 2, 3],
+          "element_2": ["a", "b", "c"]
+        },
+        "dict_list_dict_list": {
+          "element_1": [
+            {"nested_1": [1, 2, 3]}
+          ],
+          "element_2": [
+            {"nested_2": ["a", "b", "c"]}
+          ]
+        },
+        "list_dict_list_dict": [
+          {"element_1":[{"nested_1": 1}]},
+          {"element_2":[{"nested_2": 2}]}
+        ],
+        "This is a very long string for testing things for the key obj testing that is longer than the max length": 0
+      }
+    },
+    "version": 1
+  }
+}

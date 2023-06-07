@@ -54,7 +54,7 @@ ${cli} query utxo \
     --out-file ../tmp/script_utxo.json
 TXNS=$(jq length ../tmp/script_utxo.json)
 if [ "${TXNS}" -eq "0" ]; then
-   echo -e "\n \033[0;31m NO UTxOs Found At ${script_address} \033[0m \n";
+   echo -e "\n \033[0;31m NO UTxOs Found At ${cip68_script_address} \033[0m \n";
    exit;
 fi
 alltxin=""

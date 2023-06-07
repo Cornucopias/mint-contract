@@ -49,8 +49,8 @@ IFS='#' read -ra array <<< "$string"
 prefix_100="2831303029"
 prefix_222="2832323229"
 
-ref_name=$(python3 -c "import sys; sys.path.append('../py/'); from getTokenName import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_100}')")
-nft_name=$(python3 -c "import sys; sys.path.append('../py/'); from getTokenName import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_222}')")
+ref_name=$(python3 -c "import sys; sys.path.append('../py/'); from get_token_name import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_100}')")
+nft_name=$(python3 -c "import sys; sys.path.append('../py/'); from get_token_name import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_222}')")
 
 echo -n $ref_name > ../tmp/ref.token
 echo -n $nft_name > ../tmp/nft.token
@@ -79,7 +79,7 @@ UTXO_VALUE=$(${cli} transaction calculate-min-required-utxo \
 receiver_address_out="${receiver_address} + ${UTXO_VALUE} + ${NFT_ASSET}"
 
 echo "Ref Mint OUTPUT:" ${reference_address_out}
-echo "NFT Mint OUTPUT:" ${receiver_address_out}
+echo "Nft Mint OUTPUT:" ${receiver_address_out}
 #
 # exit
 #
@@ -103,8 +103,8 @@ FEE=$(${cli} transaction build \
     --babbage-era \
     --out-file ../tmp/tx.draft \
     --change-address ${receiver_address} \
-    --tx-in-collateral="${collat_utxo}" \
     --tx-in ${receiver_tx_in} \
+    --tx-in-collateral="${collat_utxo}" \
     --tx-out="${reference_address_out}" \
     --tx-out-inline-datum-file ../data/cip68/metadata-datum.json \
     --tx-out="${receiver_address_out}" \
