@@ -79,7 +79,7 @@ UTXO_VALUE=$(${cli} transaction calculate-min-required-utxo \
 receiver_address_out="${receiver_address} + ${UTXO_VALUE} + ${NFT_ASSET}"
 
 echo "Ref Mint OUTPUT:" ${reference_address_out}
-echo "NFT Mint OUTPUT:" ${receiver_address_out}
+echo "Nft Mint OUTPUT:" ${receiver_address_out}
 #
 # exit
 #

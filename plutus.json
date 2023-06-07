@@ -2,7 +2,7 @@
   "preamble": {
     "title": "aiken-lang/mint_contract",
     "description": "CIP68 Minting And Metadatum Storage Contracts for Cornucopias",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "plutusVersion": "v2",
     "license": "GPL-3.0"
   },
