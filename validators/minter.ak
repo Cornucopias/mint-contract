@@ -34,7 +34,7 @@ validator(
     // the minted value from the tx
     let mint =
       tx.mint
-        |> value.without_lovelace()
+        |> value.from_minted_value()
         |> value.flatten()
     // MINT ONLY
     when context.purpose is {
