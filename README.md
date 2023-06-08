@@ -4,6 +4,22 @@ This is an open-source contract for minting CIP68 NFTs (Non-Fungible Tokens) for
 
 Let's assume that the purchaser of the token intends to provide the minimum ADA (Cardano) required for the metadatum UTxO (Unspent Transaction Output). In this case, the hotkey's sole responsibility is to sign transactions and is not involved in any transaction payments. If a reference token is burned, the owner of the NFT token should have the right to receive the remaining ADA from the metadatum UTXO. This residual ADA represents the token's intrinsic value, which is stored exclusively in the metadata contract.
 
+## Aiken Installation
+
+First, install `aikup`: a basic utility tool to download and manage Aiken's pre-compiled executables:
+
+```bash
+curl -sSfL https://install.aiken-lang.org | bash
+```
+
+Then, simply run:
+
+```bash
+aikup
+```
+
+Having `aiken` on path is required for compiling the smart contracts with the `complete_build.sh` script. Note that this only works for Linux & MacOS.
+
 ## Setup
 
 The `scripts` folder is specifically designed to facilitate a quick setup for the happy path.
