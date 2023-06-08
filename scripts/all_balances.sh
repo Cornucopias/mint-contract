@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-#
+
 # SET UP VARS HERE
 source .env
 
@@ -8,13 +8,16 @@ source .env
 cip68_script_path="../contracts/cip68_contract.plutus"
 cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} ${network})
 
-
+# get current parameters
+mkdir -p ./tmp
 ${cli} query protocol-parameters ${network} --out-file ./tmp/protocol.json
 ${cli} query tip ${network} | jq
-#
-echo -e "\033[1;35m CIP68 Script Address: \033[0m" 
+
+# metadatum
+echo -e "\033[1;35m Metadatum Contract Address: \033[0m" 
 echo -e "\n \033[1;35m ${cip68_script_address} \033[0m \n";
 ${cli} query utxo --address ${cip68_script_address} ${network}
+
 #
 # Loop through each -wallet folder
 for wallet_folder in wallets/*-wallet; do

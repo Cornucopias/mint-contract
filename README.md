@@ -30,7 +30,7 @@ The node environment files will need to be set up before any of the scripts will
 
 ### Wallets
 
-To facilitate the setup process, it is necessary to have a folder named `wallets` within the scripts directory. This folder will be used for creating the testnet wallets.
+To facilitate the setup process, it is necessary to have a folder named `wallets` within the `scripts` directory. This folder will be used for creating the testnet wallets.
 
 The wallets can be created with these commands:
 
