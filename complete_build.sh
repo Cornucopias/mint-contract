@@ -9,20 +9,20 @@ cli=$(cat ./scripts/data/path_to_cli.sh)
 
 # check if jq is installed
 if command -v jq >/dev/null 2>&1; then
-    echo "jq is installed"
+    echo "JQ Is Installed"
 else
-    echo "jq is not installed"
+    echo "Please Install JQ"
     exit 1;
 fi
 
 # check if the cbor module is installed
-python3 -c "import importlib.util, sys; print('Python3 CBOR2 is installed.') if importlib.util.find_spec('cbor2') else print('Please Install Python3 CBOR2') or sys.exit(1)"
+python3 -c "import importlib.util, sys; print('Python3 CBOR2 Is Installed') if importlib.util.find_spec('cbor2') else print('Please Install Python3 CBOR2') or sys.exit(1)"
 
 # Check if the hot wallet exists
 if [[ -e "scripts/wallets/hot-wallet/payment.vkey" ]]; then
-    echo "Hot Wallet Exists!"
+    echo "Hot Wallet Exists"
 else
-    echo "Please Create The Hot Wallet!"
+    echo "Please Create The Hot Wallet"
     exit 1;
 fi
 
