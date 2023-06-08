@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -e
+
 #
 rm tmp/tx.signed || True
 
 # SET UP VARS HERE
 source .env
-
 
 # Addresses
 sender_path="wallets/receiver-wallet/"

@@ -4,8 +4,30 @@ set -e
 # cli path
 cli=$(cat ./scripts/data/path_to_cli.sh)
 
+###############################################################################
+###############################################################################
+
+# check if jq is installed
+if command -v jq >/dev/null 2>&1; then
+    echo "jq is installed"
+else
+    echo "jq is not installed"
+    exit 1;
+fi
+
 # check if the cbor module is installed
 python3 -c "import importlib.util, sys; print('Python3 CBOR2 is installed.') if importlib.util.find_spec('cbor2') else print('Please Install Python3 CBOR2') or sys.exit(1)"
+
+# Check if the hot wallet exists
+if [[ -e "scripts/wallets/hot-wallet/payment.vkey" ]]; then
+    echo "Hot Wallet Exists!"
+else
+    echo "Please Create The Hot Wallet!"
+    exit 1;
+fi
+
+###############################################################################
+###############################################################################
 
 # create directories if dont exist
 mkdir -p contracts
@@ -23,8 +45,8 @@ aiken build
 ###############################################################################
 ###############################################################################
 # assume hot key wallet is in wallets folder and compile scripts
-# these lines below can be commneted out for a simply hardcoding of the start_info file
-# if the hot wallet doesn't then this should fail
+# these lines below can be commented out for a simply hardcoding of the start_info.json file
+#
 hot_pkh=$(${cli} address key-hash --payment-verification-key-file scripts/wallets/hot-wallet/payment.vkey)
 variable=${hot_pkh}; jq --arg variable "$variable" '.hotKey=$variable' start_info.json > start_info-new.json
 mv start_info-new.json start_info.json
