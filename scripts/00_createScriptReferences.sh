@@ -2,12 +2,10 @@
 set -e
 
 # SET UP VARS HERE
-export CARDANO_NODE_SOCKET_PATH=$(cat ./data/path_to_socket.sh)
-cli=$(cat ./data/path_to_cli.sh)
-testnet_magic=$(cat ./data/testnet.magic)
+source .env
 
 mkdir -p ./tmp
-${cli} query protocol-parameters --testnet-magic ${testnet_magic} --out-file ./tmp/protocol.json
+${cli} query protocol-parameters ${network} --out-file ./tmp/protocol.json
 
 # contract path
 cip68_script_path="../contracts/cip68_contract.plutus"
@@ -44,7 +42,7 @@ echo -e "\nCreating Mint Script:\n" ${mint_script_reference_utxo}
 #
 echo -e "\033[0;35m\nGathering UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${reference_address} \
     --out-file ./tmp/reference_utxo.json
 
@@ -75,7 +73,7 @@ ${cli} transaction build-raw \
     --tx-out-reference-script-file ${cip68_script_path} \
     --fee 900000
 
-FEE=$(cardano-cli transaction calculate-min-fee --tx-body-file ./tmp/tx.draft --testnet-magic ${testnet_magic} --protocol-params-file ./tmp/protocol.json --tx-in-count 0 --tx-out-count 0 --witness-count 1)
+FEE=$(cardano-cli transaction calculate-min-fee --tx-body-file ./tmp/tx.draft ${network} --protocol-params-file ./tmp/protocol.json --tx-in-count 0 --tx-out-count 0 --witness-count 1)
 # echo $FEE
 fee=$(echo $FEE | rev | cut -c 9- | rev)
 
@@ -97,7 +95,7 @@ ${cli} transaction sign \
     --signing-key-file ./wallets/reference-wallet/payment.skey \
     --tx-body-file ./tmp/tx.draft \
     --out-file ./tmp/tx-1.signed \
-    --testnet-magic ${testnet_magic}
+    ${network}
 
 ###############################################################################
 
@@ -115,7 +113,7 @@ ${cli} transaction build-raw \
     --tx-out-reference-script-file ${mint_script_path} \
     --fee 900000
 
-FEE=$(${cli} transaction calculate-min-fee --tx-body-file ./tmp/tx.draft --testnet-magic ${testnet_magic} --protocol-params-file ./tmp/protocol.json --tx-in-count 0 --tx-out-count 0 --witness-count 1)
+FEE=$(${cli} transaction calculate-min-fee --tx-body-file ./tmp/tx.draft ${network} --protocol-params-file ./tmp/protocol.json --tx-in-count 0 --tx-out-count 0 --witness-count 1)
 # echo $FEE
 fee=$(echo $FEE | rev | cut -c 9- | rev)
 
@@ -136,7 +134,7 @@ ${cli} transaction sign \
     --signing-key-file ./wallets/reference-wallet/payment.skey \
     --tx-body-file ./tmp/tx.draft \
     --out-file ./tmp/tx-2.signed \
-    --testnet-magic ${testnet_magic}
+    ${network}
 ###############################################################################
 
 #
@@ -144,11 +142,11 @@ ${cli} transaction sign \
 #
 echo -e "\033[0;34m\nSubmitting \033[0m"
 ${cli} transaction submit \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --tx-file ./tmp/tx-1.signed
 
 ${cli} transaction submit \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --tx-file ./tmp/tx-2.signed
 
 ###############################################################################

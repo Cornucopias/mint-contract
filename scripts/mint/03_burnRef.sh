@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-export CARDANO_NODE_SOCKET_PATH=$(cat ../data/path_to_socket.sh)
-cli=$(cat ../data/path_to_cli.sh)
-testnet_magic=$(cat ../data/testnet.magic)
+# SET UP VARS HERE
+cd ..
+source .env
+cd mint
 
 # get params
-${cli} query protocol-parameters --testnet-magic ${testnet_magic} --out-file ../tmp/protocol.json
+${cli} query protocol-parameters ${network} --out-file ../tmp/protocol.json
 
 #
 hot_address=$(cat ../wallets/hot-wallet/payment.addr)
@@ -26,7 +27,7 @@ token_name=$(cat ../tmp/ref.token)
 
 echo -e "\033[0;36m Gathering Artist UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${receiver_address} \
     --out-file ../tmp/receiver_utxo.json
 
@@ -48,7 +49,7 @@ BURN_ASSET="-1 ${policy_id}.${token_name}"
 
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
 TXNS=$(jq length ../tmp/collat_utxo.json)
@@ -76,7 +77,7 @@ FEE=$(${cli} transaction build \
     --mint-plutus-script-v2 \
     --policy-id="${policy_id}" \
     --mint-reference-tx-in-redeemer-file ../data/mint/burn-redeemer.json \
-    --testnet-magic ${testnet_magic})
+    ${network})
 
 IFS=':' read -ra VALUE <<< "${FEE}"
 IFS=' ' read -ra FEE <<< "${VALUE[1]}"
@@ -92,13 +93,13 @@ ${cli} transaction sign \
     --signing-key-file ../wallets/hot-wallet/payment.skey \
     --tx-body-file ../tmp/tx.draft \
     --out-file ../tmp/tx.signed \
-    --testnet-magic ${testnet_magic}
+    ${network}
 #    
 # exit
 #
 echo -e "\033[0;36m Submitting \033[0m"
 ${cli} transaction submit \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --tx-file ../tmp/tx.signed
 
 tx=$(cardano-cli transaction txid --tx-file ../tmp/tx.signed)
