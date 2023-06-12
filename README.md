@@ -36,10 +36,10 @@ The wallets can be created with these commands:
 
 ```bash
 mkdir -p wallets
-./create_wallet wallets/hot-wallet
-./create_wallet wallets/collat-wallet
-./create_wallet wallets/receiver-wallet
-./create_wallet wallets/reference-wallet
+./create_wallet.sh wallets/hot-wallet
+./create_wallet.sh wallets/collat-wallet
+./create_wallet.sh wallets/receiver-wallet
+./create_wallet.sh wallets/reference-wallet
 ```
 
 With a fully syncd testnet node and correct node environment, we can view the balances of the wallets and send tADA (testnet ADA) to them from a testnet wallet or faucet. The collat wallet should be allocated 5 tADA, while the hot wallet doesn't require tADA as it is solely used for signing transactions. The receiver wallet should have approximately 100 tADA, and the reference wallet should also hold around 100 tADA. The wallet balances can be verified by using the `./all_balances.sh` script. Now that the wallets are created and prepared with tADA, let's proceed with the compilation phase.
