@@ -1,8 +1,42 @@
 {
   "721": {
-    "": {
-      "": {}
-    },
-    "version": 1
+    "<policy_id>": {
+      "<asset_name>": {
+        "name": "Relic Print #0001",
+        "image": "ar://<uri | hi-res>",
+        "mediaType": "image/png",
+        "description": "Photos recovered from the Cornucopias imaging archive",
+        "files": [
+          {
+            "name": "web-resolution",
+            "mediaType": "image/png",
+            "src": "ar://<web-res>"
+          }
+        ],
+        "typeClass": "",
+        "project_name": "Cornucopias Game",
+        "attributes": {
+          "image_description": "Pond at sunrise",
+          "archive": "Relic Print",
+          "printing_company": "Cornucopias Imaging",
+          "capture_location": "Solace",
+          "camera_model": "",
+          "photographer": "",
+          "image_type": "Film",
+          "format": "Medium Format",
+          "focal_length": "14mm",
+          "iso": "400",
+          "shutter_speed": "1/400",
+          "aperture": "f/4.0",
+          "captured_at": "<date>"
+        },
+        "links": {
+          "website": "https://cornucopias.io",
+          "discord": "https://discord.gg/cornucopiasofficial",
+          "link_tree": "https://linktr.ee/CornucopiasGame"
+        }
+      },
+      "version": 1
+    }
   }
 }

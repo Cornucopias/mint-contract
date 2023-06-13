@@ -481,8 +481,8 @@ if __name__ == "__main__":
     file_path = "../data/meta/corn.metadata.json"
     datum_path = "../data/cip68/metadata-datum.json"
     tag = '721'
-    pid = ''
-    tkn = ''
+    pid = '<policy_id>'
+    tkn = '<asset_name>'
     version = 1
     convert_metadata(file_path, datum_path, tag, pid, tkn, version)
     
