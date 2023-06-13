@@ -23,6 +23,7 @@ ${cli} query utxo --address ${cip68_script_address} ${network}
 for wallet_folder in wallets/*-wallet; do
     # Check if payment.addr file exists in the folder
     if [ -f "${wallet_folder}/payment.addr" ]; then
+        ${cli} address build --payment-verification-key-file ${wallet_folder}/payment.vkey --out-file ${wallet_folder}/payment.addr ${network}
         addr=$(cat ${wallet_folder}/payment.addr)
         echo
         echo -e "\033[1;34m $wallet_folder $addr \033[0m"

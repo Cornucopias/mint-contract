@@ -3,14 +3,24 @@
     "<policy_id>": {
       "<asset_name>": {
         "name": "Relic Print #0001",
-        "image": "ar://<uri | hi-res>",
-        "mediaType": "image/png",
+        "image": "ar://XxUIhdq643Ajb1StXYMLmfTOZyzLdSYwkw933sZ9xTw",
+        "mediaType": "image/jpg",
         "description": "Photos recovered from the Cornucopias imaging archive",
         "files": [
           {
-            "name": "web-resolution",
-            "mediaType": "image/png",
-            "src": "ar://<web-res>"
+            "name": "front-web-resolution",
+            "mediaType": "image/jpg",
+            "src": "ar://COoHMYC0QjCL1CO9k0HjEm8w8ab6f7omM4IJKDppt0c"
+          },
+          {
+            "name": "back-web-resolution",
+            "mediaType": "image/jpg",
+            "src": "ar://C9eCvtGM-lLu_TM0qwaR_1jR438a6xHPGb4D69jg3bk"
+          },
+          {
+            "name": "back-high-res",
+            "mediaType": "image/jpg",
+            "src": "ar://9iXb-DHw26OYQ1R6QHNHVm4eYXgDb9rxSwqjXxnb-pI"
           }
         ],
         "typeClass": "",
