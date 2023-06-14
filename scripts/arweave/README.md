@@ -1,5 +1,10 @@
 # Arweave Instructions
 
+Install packages with
+
+```bash
+npm install
+```
 
 ## Wallet Creation
 
