@@ -47,8 +47,8 @@ first_utxo=$(jq -r 'keys[0]' ../tmp/receiver_utxo.json)
 string=${first_utxo}
 IFS='#' read -ra array <<< "$string"
 
-prefix_100="2831303029"
-prefix_222="2832323229"
+prefix_100="000643b0"
+prefix_222="000de140"
 
 ref_name=$(python3 -c "import sys; sys.path.append('../py/'); from get_token_name import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_100}')")
 nft_name=$(python3 -c "import sys; sys.path.append('../py/'); from get_token_name import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_222}')")
