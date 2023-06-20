@@ -20,9 +20,13 @@ hot_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/hot
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
 collat_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/collat-wallet/payment.vkey)
 
-#
+# paying
 receiver_address=$(cat ../wallets/receiver-wallet/payment.addr)
 receiver_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/receiver-wallet/payment.vkey)
+
+# who is getting the token
+token_holder=${receiver_address}
+# token_holder=""
 
 # the minting script policy
 policy_id=$(cat ../../hashes/mint.hash)
@@ -75,9 +79,9 @@ reference_address_out="${cip68_script_address} + ${UTXO_VALUE} + ${REF_ASSET}"
 UTXO_VALUE=$(${cli} transaction calculate-min-required-utxo \
     --babbage-era \
     --protocol-params-file ../tmp/protocol.json \
-    --tx-out="${receiver_address} + 5000000 + ${NFT_ASSET}" | tr -dc '0-9')
+    --tx-out="${token_holder} + 5000000 + ${NFT_ASSET}" | tr -dc '0-9')
 
-receiver_address_out="${receiver_address} + ${UTXO_VALUE} + ${NFT_ASSET}"
+receiver_address_out="${token_holder} + ${UTXO_VALUE} + ${NFT_ASSET}"
 
 echo "Ref Mint OUTPUT:" ${reference_address_out}
 echo "Nft Mint OUTPUT:" ${receiver_address_out}
