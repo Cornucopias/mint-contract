@@ -17,6 +17,7 @@ ${cli} query tip ${network} | jq
 echo -e "\033[1;35m Metadatum Contract Address: \033[0m" 
 echo -e "\n \033[1;35m ${cip68_script_address} \033[0m \n";
 ${cli} query utxo --address ${cip68_script_address} ${network}
+${cli} query utxo --address ${cip68_script_address} ${network} --out-file ./tmp/current_metadata.utxo
 
 #
 # Loop through each -wallet folder

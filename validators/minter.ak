@@ -8,7 +8,6 @@ use assist/payout
 use assist/prefixes
 use assist/signing
 use assist/values
-// use mint_contract/mint_validators
 use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
 
 validator(
