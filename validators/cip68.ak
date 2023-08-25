@@ -1,4 +1,3 @@
-use aiken/list
 use aiken/transaction.{ScriptContext, Spend}
 use aiken/transaction/value.{Value}
 use assist/count
@@ -55,17 +54,14 @@ validator(hot_key: ByteArray) {
         let script_addr = validating_input.output.address
         when redeemer is {
           // removes the utxo entirely from the contract
-          RemoveMeta ->
-            list.and(
-              [
-                // cornucopias must sign it
-                signing.verify_sig(tx.extra_signatories, hot_key),
-                // single script input
-                count.inputs_by_addr(tx.inputs, script_addr, 1),
-                // no script output
-                count.outputs_by_addr(tx.outputs, script_addr, 0),
-              ],
-            )
+          RemoveMeta -> and {
+              // cornucopias must sign it
+              signing.verify_sig(tx.extra_signatories, hot_key),
+              // single script input
+              count.inputs_by_addr(tx.inputs, script_addr, 1),
+              // no script output
+              count.outputs_by_addr(tx.outputs, script_addr, 0),
+            }
           // updates the metadata and change min ada
           UpdateMeta { lovelace, direction } -> {
             // set a direction to add or remove the minimum lovelace
@@ -75,18 +71,16 @@ validator(hot_key: ByteArray) {
                 lovelace,
                 direction,
               )
-            list.and(
-              [
-                // make sure value is continuing
-                payout.exact(script_addr, cont_value, tx.outputs),
-                // cornucopias must sign it
-                signing.verify_sig(tx.extra_signatories, hot_key),
-                // single script input
-                count.inputs_by_addr(tx.inputs, script_addr, 1),
-                // single script output
-                count.outputs_by_addr(tx.outputs, script_addr, 1),
-              ],
-            )
+            and {
+              // make sure value is continuing
+              payout.exact(script_addr, cont_value, tx.outputs),
+              // cornucopias must sign it
+              signing.verify_sig(tx.extra_signatories, hot_key),
+              // single script input
+              count.inputs_by_addr(tx.inputs, script_addr, 1),
+              // single script output
+              count.outputs_by_addr(tx.outputs, script_addr, 1),
+            }
           }
         }
       }
