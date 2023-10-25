@@ -6,7 +6,8 @@ source .env
 
 # cip 68 contract
 cip68_script_path="../contracts/cip68_contract.plutus"
-cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} ${network})
+stake_script_path="../contracts/stake_contract.plutus"
+cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} --stake-script-file ${stake_script_path} ${network})
 
 # get current parameters
 mkdir -p ./tmp

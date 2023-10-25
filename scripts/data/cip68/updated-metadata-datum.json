@@ -1,11 +1,1 @@
-{
-    "constructor": 0,
-    "fields": [
-        {
-            "map": []
-        },
-        {
-            "int": 1
-        }
-    ]
-}
+{"constructor": 0, "fields": [{"map": []}, {"int": 1}]}

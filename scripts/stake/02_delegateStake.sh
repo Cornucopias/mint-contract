@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
 # SET UP VARS HERE
@@ -7,43 +7,36 @@ source ../.env
 # get params
 ${cli} query protocol-parameters ${network} --out-file ../tmp/protocol.json
 
-#
-hot_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/hot-wallet/payment.vkey)
-
-#
+# collateral for stake contract
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
 collat_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/collat-wallet/payment.vkey)
 
-#
-receiver_address=$(cat ../wallets/receiver-wallet/payment.addr)
-receiver_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/receiver-wallet/payment.vkey)
+# who will pay for the tx
+hot_address=$(cat ../wallets/hot-wallet/payment.addr)
+hot_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/hot-wallet/payment.vkey)
 
-# the minting script policy
-policy_id=$(cat ../../hashes/mint.hash)
-token_name=$(cat ../tmp/nft.token)
-
-echo -e "\033[0;36m Gathering Payer UTxO Information  \033[0m"
+echo -e "\033[0;36m Gathering Payee UTxO Information  \033[0m"
 ${cli} query utxo \
     ${network} \
-    --address ${receiver_address} \
-    --out-file ../tmp/receiver_utxo.json
+    --address ${hot_address} \
+    --out-file ../tmp/hot_utxo.json
 
-TXNS=$(jq length ../tmp/receiver_utxo.json)
+TXNS=$(jq length ../tmp/hot_utxo.json)
 if [ "${TXNS}" -eq "0" ]; then
-   echo -e "\n \033[0;31m NO UTxOs Found At ${receiver_address} \033[0m \n";
+   echo -e "\n \033[0;31m NO UTxOs Found At ${hot_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' ../tmp/receiver_utxo.json)
-receiver_tx_in=${TXIN::-8}
+TXIN=$(jq -r --arg alltxin "" 'to_entries[] | select(.value.value | length < 2) | .key | . + $alltxin + " --tx-in"' ../tmp/hot_utxo.json)
+hot_tx_in=${TXIN::-8}
 
-BURN_ASSET="-1 ${policy_id}.${token_name}"
-
+# collat info
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
 ${cli} query utxo \
     ${network} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
+
 TXNS=$(jq length ../tmp/collat_utxo.json)
 if [ "${TXNS}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${collat_address} \033[0m \n";
@@ -51,24 +44,21 @@ if [ "${TXNS}" -eq "0" ]; then
 fi
 collat_utxo=$(jq -r 'keys[0]' ../tmp/collat_utxo.json)
 
-script_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/mint-reference-utxo.signed)
+script_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/stake-reference-utxo.signed )
 
-# Add metadata to this build function for nfts with data
 echo -e "\033[0;36m Building Tx \033[0m"
 FEE=$(${cli} transaction build \
     --babbage-era \
     --out-file ../tmp/tx.draft \
-    --change-address ${receiver_address} \
+    --change-address ${hot_address} \
     --tx-in-collateral="${collat_utxo}" \
-    --tx-in ${receiver_tx_in} \
-    --required-signer-hash ${receiver_pkh} \
+    --tx-in ${hot_tx_in} \
+    --certificate ../../certs/deleg.cert \
+    --certificate-tx-in-reference="${script_ref_utxo}#1" \
+    --certificate-plutus-script-v2 \
+    --certificate-reference-tx-in-redeemer-file ../data/stake/delegate-redeemer.json \
     --required-signer-hash ${collat_pkh} \
     --required-signer-hash ${hot_pkh} \
-    --mint="${BURN_ASSET}" \
-    --mint-tx-in-reference="${script_ref_utxo}#1" \
-    --mint-plutus-script-v2 \
-    --policy-id="${policy_id}" \
-    --mint-reference-tx-in-redeemer-file ../data/mint/burn-redeemer.json \
     ${network})
 
 IFS=':' read -ra VALUE <<< "${FEE}"
@@ -80,9 +70,8 @@ echo -e "\033[1;32m Fee: \033[0m" $FEE
 #
 echo -e "\033[0;36m Signing \033[0m"
 ${cli} transaction sign \
-    --signing-key-file ../wallets/receiver-wallet/payment.skey \
-    --signing-key-file ../wallets/collat-wallet/payment.skey \
     --signing-key-file ../wallets/hot-wallet/payment.skey \
+    --signing-key-file ../wallets/collat-wallet/payment.skey \
     --tx-body-file ../tmp/tx.draft \
     --out-file ../tmp/tx.signed \
     ${network}

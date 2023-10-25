@@ -2,16 +2,15 @@
 set -e
 
 # SET UP VARS HERE
-cd ..
-source .env
-cd mint
+source ../.env
 
 # get params
 ${cli} query protocol-parameters ${network} --out-file ../tmp/protocol.json
 
 # cip 68 contract
 cip68_script_path="../../contracts/cip68_contract.plutus"
-cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} ${network})
+stake_script_path="../../contracts/stake_contract.plutus"
+cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} --stake-script-file ${stake_script_path} ${network})
 
 #
 hot_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/hot-wallet/payment.vkey)
@@ -20,13 +19,12 @@ hot_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/hot
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
 collat_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/collat-wallet/payment.vkey)
 
-# paying
+# The address paying the fee and receiving the token
 receiver_address=$(cat ../wallets/receiver-wallet/payment.addr)
 receiver_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/receiver-wallet/payment.vkey)
 
 # who is getting the token
 token_holder=${receiver_address}
-# token_holder=""
 
 # the minting script policy
 policy_id=$(cat ../../hashes/mint.hash)
@@ -46,7 +44,7 @@ alltxin=""
 TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' ../tmp/receiver_utxo.json)
 receiver_tx_in=${TXIN::-8}
 
-echo "Payer UTxO:" $receiver_tx_in
+# this should default to lexico order via the cli
 first_utxo=$(jq -r 'keys[0]' ../tmp/receiver_utxo.json)
 string=${first_utxo}
 IFS='#' read -ra array <<< "$string"

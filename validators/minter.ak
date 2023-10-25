@@ -1,18 +1,18 @@
-use aiken/list
 use aiken/transaction.{Mint, ScriptContext}
-use aiken/transaction/credential
 use aiken/transaction/value
+use assist/addresses
 use assist/find
 use assist/minting
 use assist/payout
 use assist/prefixes
 use assist/signing
 use assist/values
-use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
+use mint_contract/types.{BurnTokens, CIP68Datum, MintRedeemer, MintTokens}
 
 validator(
   hot_key: ByteArray,
   cip68_hash_data: Data,
+  stake_hash_data: Data,
   _random_string: ByteArray,
 ) {
   fn params(redeemer: MintRedeemer, context: ScriptContext) -> Bool {
@@ -32,8 +32,10 @@ validator(
           MintTokens -> {
             // cip68 address know at compile time
             expect cip68_hash: ByteArray = cip68_hash_data
+            expect stake_hash: ByteArray = stake_hash_data
             // no staking at this address
-            let cip68_addr = credential.from_script(cip68_hash)
+            let cip68_addr =
+              addresses.create_script_address(cip68_hash, stake_hash)
             // get first tx info
             let first_index = find.first_input_index(tx.inputs)
             let first_tx_hash = find.first_input_txid(tx.inputs)
@@ -51,52 +53,48 @@ validator(
                 first_index,
                 prefixes.prefix_222,
               )
-            list.and(
-              [
-                // cornucopias must sign it
-                signing.verify_sig(tx.extra_signatories, hot_key),
-                // prevent roll over double nft attack
-                first_index < 256,
-                // must mint 1 reference token
-                minting.exact(mint, own_currency_symbol, ref_tkn, 1),
-                // must mint 1 non-fungible token
-                minting.exact(mint, own_currency_symbol, nft_tkn, 1),
-                // reference token must go to cip contract
-                payout.at_least(
-                  cip68_addr,
-                  value.from_asset(own_currency_symbol, ref_tkn, 1),
-                  tx.outputs,
-                ),
-              ],
-            )
+            // This should prevent utxos without cip68 datum to go to the cip68 storage contract
+            expect _: CIP68Datum =
+              find.output_datum_by_addr(tx.outputs, cip68_addr)
+            and {
+              // cornucopias must sign it
+              signing.verify_sig(tx.extra_signatories, hot_key),
+              // prevent roll over double nft attack
+              first_index < 256,
+              // must mint 1 reference token
+              minting.exact(mint, own_currency_symbol, ref_tkn, 1),
+              // must mint 1 non-fungible token
+              minting.exact(mint, own_currency_symbol, nft_tkn, 1),
+              // reference token must go to cip contract
+              payout.at_least(
+                cip68_addr,
+                value.from_asset(own_currency_symbol, ref_tkn, 1),
+                tx.outputs,
+              ),
+            }
           }
           // can burn the ref or the nft or both at the same time
-          BurnTokens ->
-            list.and(
-              [
-                // cornucopias must sign it
-                signing.verify_sig(tx.extra_signatories, hot_key),
-                // the or allows the optionional burning
-                list.or(
-                  [
-                    // burn only 1 ref token
-                    minting.by_prefix(
-                      mint,
-                      own_currency_symbol,
-                      prefixes.prefix_100,
-                      -1,
-                    ),
-                    // burn only 1 nft
-                    minting.by_prefix(
-                      mint,
-                      own_currency_symbol,
-                      prefixes.prefix_222,
-                      -1,
-                    ),
-                  ],
+          BurnTokens -> and {
+              // cornucopias must sign it
+              signing.verify_sig(tx.extra_signatories, hot_key),
+              // the or allows the optionional burning
+              or {
+                // burn only 1 ref token
+                minting.by_prefix(
+                  mint,
+                  own_currency_symbol,
+                  prefixes.prefix_100,
+                  -1,
                 ),
-              ],
-            )
+                // burn only 1 nft
+                minting.by_prefix(
+                  mint,
+                  own_currency_symbol,
+                  prefixes.prefix_222,
+                  -1,
+                ),
+              },
+            }
         }
       // Mint Only
       _ -> False
