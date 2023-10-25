@@ -61,7 +61,7 @@ mv start_info-new.json start_info.json
 hot=$(jq -r '.hotKey' start_info.json)
 hot_cbor=$(python3 -c "import cbor2;hex_string='${hot}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
 
-echo -e "\033[1;33m\nConvert CIP68 Contract\033[0m"
+echo -e "\033[1;33m\nConvert CIP68 Metadatum Storage Contract\033[0m"
 aiken blueprint apply -o plutus.json -v cip68.params "${hot_cbor}"
 aiken blueprint convert -v cip68.params > contracts/cip68_contract.plutus
 ${cli} transaction policyid --script-file contracts/cip68_contract.plutus > hashes/cip68.hash
@@ -70,6 +70,15 @@ ${cli} transaction policyid --script-file contracts/cip68_contract.plutus > hash
 cip68_hash=$(cat hashes/cip68.hash)
 cip68_hash_cbor=$(python3 -c "import cbor2;hex_string='${cip68_hash}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
 
+echo -e "\033[1;33m\nConvert CIP68 Staking Contract\033[0m"
+aiken blueprint apply -o plutus.json -v staking.params "${hot_cbor}"
+aiken blueprint convert -v staking.params > contracts/staking_contract.plutus
+${cli} transaction policyid --script-file contracts/staking_contract.plutus > hashes/staking.hash
+
+# convert cip 68 hash into cbor
+staking_hash=$(cat hashes/staking.hash)
+staking_hash_cbor=$(python3 -c "import cbor2;hex_string='${staking_hash}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
+
 # random bit
 ran=$(jq -r '.random' start_info.json)
 ran_cbor=$(python3 -c "import cbor2;hex_string='${ran}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
@@ -77,6 +86,7 @@ ran_cbor=$(python3 -c "import cbor2;hex_string='${ran}';data = bytes.fromhex(hex
 echo -e "\033[1;33m\nConvert Minting Contract\033[0m"
 aiken blueprint apply -o plutus.json -v minter.params "${hot_cbor}"
 aiken blueprint apply -o plutus.json -v minter.params "${cip68_hash_cbor}"
+aiken blueprint apply -o plutus.json -v minter.params "${staking_hash_cbor}"
 aiken blueprint apply -o plutus.json -v minter.params "${ran_cbor}"
 aiken blueprint convert -v minter.params > contracts/mint_contract.plutus
 ${cli} transaction policyid --script-file contracts/mint_contract.plutus > hashes/mint.hash
