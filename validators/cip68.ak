@@ -43,6 +43,9 @@ validator(hot_key: ByteArray) {
                 value.ada_asset_name,
                 lovelace,
               )
+            // This should prevent utxos without cip68 datum to go to the cip68 storage contract
+            expect _: CIP68Datum =
+              find.output_datum_by_addr(tx.outputs, this_addr)
             and {
               // make sure value is continuing
               payout.exact(this_addr, cont_value, tx.outputs)?,

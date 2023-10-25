@@ -2,20 +2,18 @@
 set -e
 
 # SET UP VARS HERE
-cd ..
-source .env
-cd cip68
+source ../.env
 
 # cip 68 contract
 cip68_script_path="../../contracts/cip68_contract.plutus"
-cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} ${network})
+stake_script_path="../../contracts/stake_contract.plutus"
+cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} --stake-script-file ${stake_script_path} ${network})
 
 # collat
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
 collat_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/collat-wallet/payment.vkey)
 
 # hot key
-hot_address=$(cat ../wallets/hot-wallet/payment.addr)
 hot_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/hot-wallet/payment.vkey)
 
 # receiver
@@ -85,7 +83,6 @@ collat_tx_in=$(jq -r 'keys[0]' ../tmp/collat_utxo.json)
 
 # script reference utxo
 script_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/cip-reference-utxo.signed )
-mint_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/mint-reference-utxo.signed )
 
 echo -e "\033[0;36m Building Tx \033[0m"
 FEE=$(${cli} transaction build \

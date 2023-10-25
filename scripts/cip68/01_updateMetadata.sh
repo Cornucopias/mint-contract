@@ -2,13 +2,12 @@
 set -e
 
 # SET UP VARS HERE
-cd ..
-source .env
-cd cip68
+source ../.env
 
 # cip 68 contract
 cip68_script_path="../../contracts/cip68_contract.plutus"
-cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} ${network})
+stake_script_path="../../contracts/stake_contract.plutus"
+cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} --stake-script-file ${stake_script_path} ${network})
 
 # collat
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
@@ -41,16 +40,10 @@ updated_min_utxo=$(${cli} transaction calculate-min-required-utxo \
 
 difference=$((${updated_min_utxo} - ${current_min_utxo}))
 
-direction=0
 if [ "$difference" -eq "0" ]; then
     echo "Minimum ADA Constant"
-    min_utxo=${updated_min_utxo}
-    difference=0
 elif [ "$difference" -lt "0" ]; then
-    positive=$(( -1 * ${difference}))
-    echo "Minimum ADA Decreasing by" ${positive}
-    direction=1
-    difference=$positive
+    echo "Minimum ADA Decreasing by" ${difference}
 else
     echo "Minimum ADA Increasing by" ${difference}
 fi
@@ -62,9 +55,6 @@ min_utxo=${updated_min_utxo}
 variable=${difference}; jq --argjson variable "$variable" '.fields[0].int=$variable' ../data/cip68/update-redeemer.json > ../data/cip68/update-redeemer-new.json
 mv ../data/cip68/update-redeemer-new.json ../data/cip68/update-redeemer.json
 
-# update the direciton, 0 is increase
-variable=${direction}; jq --argjson variable "$variable" '.fields[1].int=$variable' ../data/cip68/update-redeemer.json > ../data/cip68/update-redeemer-new.json
-    mv ../data/cip68/update-redeemer-new.json ../data/cip68/update-redeemer.json
 
 script_address_out="${cip68_script_address} + ${min_utxo} + ${asset}"
 echo "Update OUTPUT: "${script_address_out}

@@ -2,9 +2,7 @@
 set -e
 
 # SET UP VARS HERE
-cd ..
-source .env
-cd mint
+source ../.env
 
 
 # get params
@@ -12,10 +10,10 @@ ${cli} query protocol-parameters ${network} --out-file ../tmp/protocol.json
 
 # cip 68 contract
 cip68_script_path="../../contracts/cip68_contract.plutus"
-cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} ${network})
+stake_script_path="../../contracts/stake_contract.plutus"
+cip68_script_address=$(${cli} address build --payment-script-file ${cip68_script_path} --stake-script-file ${stake_script_path} ${network})
 
 #
-hot_address=$(cat ../wallets/hot-wallet/payment.addr)
 hot_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/hot-wallet/payment.vkey)
 
 #
