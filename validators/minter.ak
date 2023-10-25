@@ -1,4 +1,3 @@
-use aiken/list
 use aiken/transaction.{Mint, ScriptContext}
 use aiken/transaction/credential
 use aiken/transaction/value
@@ -51,52 +50,45 @@ validator(
                 first_index,
                 prefixes.prefix_222,
               )
-            list.and(
-              [
-                // cornucopias must sign it
-                signing.verify_sig(tx.extra_signatories, hot_key),
-                // prevent roll over double nft attack
-                first_index < 256,
-                // must mint 1 reference token
-                minting.exact(mint, own_currency_symbol, ref_tkn, 1),
-                // must mint 1 non-fungible token
-                minting.exact(mint, own_currency_symbol, nft_tkn, 1),
-                // reference token must go to cip contract
-                payout.at_least(
-                  cip68_addr,
-                  value.from_asset(own_currency_symbol, ref_tkn, 1),
-                  tx.outputs,
-                ),
-              ],
-            )
+            and {
+              // cornucopias must sign it
+              signing.verify_sig(tx.extra_signatories, hot_key),
+              // prevent roll over double nft attack
+              first_index < 256,
+              // must mint 1 reference token
+              minting.exact(mint, own_currency_symbol, ref_tkn, 1),
+              // must mint 1 non-fungible token
+              minting.exact(mint, own_currency_symbol, nft_tkn, 1),
+              // reference token must go to cip contract
+              payout.at_least(
+                cip68_addr,
+                value.from_asset(own_currency_symbol, ref_tkn, 1),
+                tx.outputs,
+              ),
+            }
           }
           // can burn the ref or the nft or both at the same time
-          BurnTokens ->
-            list.and(
-              [
-                // cornucopias must sign it
-                signing.verify_sig(tx.extra_signatories, hot_key),
-                // the or allows the optionional burning
-                list.or(
-                  [
-                    // burn only 1 ref token
-                    minting.by_prefix(
-                      mint,
-                      own_currency_symbol,
-                      prefixes.prefix_100,
-                      -1,
-                    ),
-                    // burn only 1 nft
-                    minting.by_prefix(
-                      mint,
-                      own_currency_symbol,
-                      prefixes.prefix_222,
-                      -1,
-                    ),
-                  ],
+          BurnTokens -> and {
+              // cornucopias must sign it
+              signing.verify_sig(tx.extra_signatories, hot_key),
+              // the or allows the optionional burning
+              or {
+                // burn only 1 ref token
+                minting.by_prefix(
+                  mint,
+                  own_currency_symbol,
+                  prefixes.prefix_100,
+                  -1,
                 ),
-              ],
-            )
+                // burn only 1 nft
+                minting.by_prefix(
+                  mint,
+                  own_currency_symbol,
+                  prefixes.prefix_222,
+                  -1,
+                ),
+              },
+            }
         }
       // Mint Only
       _ -> False
