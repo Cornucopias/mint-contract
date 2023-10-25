@@ -1,17 +1,18 @@
 use aiken/transaction.{Mint, ScriptContext}
-use aiken/transaction/credential
 use aiken/transaction/value
+use assist/addresses
 use assist/find
 use assist/minting
 use assist/payout
 use assist/prefixes
 use assist/signing
 use assist/values
-use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
+use mint_contract/types.{BurnTokens, CIP68Datum, MintRedeemer, MintTokens}
 
 validator(
   hot_key: ByteArray,
   cip68_hash_data: Data,
+  stake_hash_data: Data,
   _random_string: ByteArray,
 ) {
   fn params(redeemer: MintRedeemer, context: ScriptContext) -> Bool {
@@ -31,8 +32,10 @@ validator(
           MintTokens -> {
             // cip68 address know at compile time
             expect cip68_hash: ByteArray = cip68_hash_data
+            expect stake_hash: ByteArray = stake_hash_data
             // no staking at this address
-            let cip68_addr = credential.from_script(cip68_hash)
+            let cip68_addr =
+              addresses.create_script_address(cip68_hash, stake_hash)
             // get first tx info
             let first_index = find.first_input_index(tx.inputs)
             let first_tx_hash = find.first_input_txid(tx.inputs)
@@ -50,6 +53,9 @@ validator(
                 first_index,
                 prefixes.prefix_222,
               )
+            // This should prevent utxos without cip68 datum to go to the cip68 storage contract
+            expect _: CIP68Datum =
+              find.output_datum_by_addr(tx.outputs, cip68_addr)
             and {
               // cornucopias must sign it
               signing.verify_sig(tx.extra_signatories, hot_key),
