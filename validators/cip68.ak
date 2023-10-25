@@ -23,6 +23,7 @@ validator(hot_key: ByteArray) {
         let this_addr = this_input.output.address
         when redeemer is {
           // removes the utxo entirely from the contract
+          // this doesn't check for burn or destination for more of an open ended approach
           RemoveMeta -> and {
               // cornucopias must sign it
               signing.verify_sig(tx.extra_signatories, hot_key),
@@ -48,7 +49,7 @@ validator(hot_key: ByteArray) {
               find.output_datum_by_addr(tx.outputs, this_addr)
             and {
               // make sure value is continuing
-              payout.exact(this_addr, cont_value, tx.outputs)?,
+              payout.exact(this_addr, cont_value, tx.outputs),
               // cornucopias must sign it
               signing.verify_sig(tx.extra_signatories, hot_key),
               // single script input
