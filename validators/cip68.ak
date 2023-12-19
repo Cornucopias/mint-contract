@@ -6,6 +6,7 @@ use assist/payout
 use assist/signing
 use mint_contract/types.{CIP68Datum, CIP68Redeemer, RemoveMeta, UpdateMeta}
 
+// This allows a hot key to update or remove metadatum for a cip68 token.
 validator(hot_key: ByteArray) {
   fn params(
     _datum: CIP68Datum,
@@ -45,6 +46,7 @@ validator(hot_key: ByteArray) {
                 lovelace,
               )
             // This should prevent utxos without cip68 datum to go to the cip68 storage contract
+            // This Forces An Inline Datum!
             expect _: CIP68Datum =
               find.output_datum_by_addr(tx.outputs, this_addr)
             and {

@@ -4,4 +4,5 @@ artifacts/
 build/
 # Aiken's default documentation export
 docs/
-#
+# this causes issues for some reason
+aiken.lock

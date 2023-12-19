@@ -26,11 +26,11 @@ def int_obj(integer: int) -> dict:
     # positive integers
     if integer < 0:
         raise ValueError("Integer Must Non-Negative")
-    
+
     # integers only
     if not isinstance(integer, int):
         raise ValueError("Value Must be An Integer")
-    
+
     # simple int object
     return {"int": integer}
 
@@ -75,7 +75,7 @@ def byte_obj(string: str) -> dict:
     # string only
     if not isinstance(string, str):
         raise TypeError("Input Must Be A String")
-    
+
     # if string is longer than accepted length then create list of strings
     if len(string) > MAX_LENGTH:
 
@@ -113,11 +113,11 @@ def key_obj(string: str) -> dict:
     ...
     TypeError: Input Must Be A String
     """
-    
+
     # string only
     if not isinstance(string, str):
         raise TypeError("Input Must Be A String")
-    
+
     # the string here is in ascii since its the 721 keys
     if len(string) > MAX_LENGTH // 2:
         # trim the string down
@@ -130,7 +130,7 @@ def key_obj(string: str) -> dict:
 def dict_obj(data: dict, key: str) -> dict:
     """
     This creates the dictionary object.
-    
+
     >>> dict_obj({}, '')
     {'map': []}
     >>> dict_obj({'':{}}, '')
@@ -185,7 +185,7 @@ def dict_obj(data: dict, key: str) -> dict:
         # something that isnt a standard type
         else:
             raise TypeError("Forbidden Plutus Type")
-    
+
     # simple dict object
     return nested_map
 
@@ -261,11 +261,11 @@ def read_metadata_file(file_path: str) -> dict:
     ...
     TypeError: File Path Must Be A String
     """
-    
+
     # string only
     if not isinstance(file_path, str):
         raise TypeError("File Path Must Be A String")
-    
+
     # attempt file read
     try:
         with open(file_path) as f:
@@ -294,7 +294,7 @@ def write_metadatum_file(file_path: str, data: dict) -> None:
     Traceback (most recent call last):
         ...
     TypeError: Error serializing data type
-    
+
     >>> write_metadatum_file("../data/meta/example.json", {"key": "value"})
     >>> data = read_metadata_file("../data/meta/example.json")
     >>> data == {"key": "value"}
@@ -304,11 +304,11 @@ def write_metadatum_file(file_path: str, data: dict) -> None:
     ...
     TypeError: File Path Must Be A String
     """
-    
+
     # string only
     if not isinstance(file_path, str):
         raise TypeError("File Path Must Be A String")
-    
+
     # attempt file write
     try:
         with open(file_path, "w") as f:
@@ -321,6 +321,7 @@ def write_metadatum_file(file_path: str, data: dict) -> None:
     # data is bad
     except TypeError:
         raise TypeError("Error serializing data type")
+
 
 def get_metadata_headers(file_path: str) -> Tuple[str, str, str]:
     """
@@ -337,27 +338,28 @@ def get_metadata_headers(file_path: str) -> Tuple[str, str, str]:
     ...
     TypeError: File Path Must Be A String
     """
-    
+
     # string only
     if not isinstance(file_path, str):
         raise TypeError("File Path Must Be A String")
-    
+
     data = read_metadata_file(file_path)
-    
+
     # TODO multitag or multitoken
-    
+
     # single tag metadata
     tag = next(iter(data.keys())) if len(data) == 1 else None
-    
+
     # has token and version
     pid = next(iter(data[str(tag)].keys())) if len(data[tag]) == 2 else None
-    
+
     # just token data
-    tkn = next(iter(data[tag][pid].keys())) if len(data[tag][pid]) == 1 else None
-    
+    tkn = next(iter(data[tag][pid].keys())) if len(
+        data[tag][pid]) == 1 else None
+
     # return the tuple
     return tag, pid, tkn
-    
+
 
 def create_metadatum(file_path: str, tag: str, pid: str, tkn: str, version: int) -> dict:
     """
@@ -379,11 +381,11 @@ def create_metadatum(file_path: str, tag: str, pid: str, tkn: str, version: int)
     ...
     TypeError: File Path Must Be A String
     """
-    
+
     # string only
     if not isinstance(file_path, str):
         raise TypeError("File Path Must Be A String")
-    
+
     # parent structure
     metadatum = {
         "constructor": 0,
@@ -460,15 +462,15 @@ def convert_metadata(file_path: str, datum_path: str, tag: str, pid: str, tkn: s
     ...
     TypeError: File Path Must Be A String
     """
-    
+
     # string only
     if not isinstance(file_path, str):
         raise TypeError("File Path Must Be A String")
-    
+
     # string only
     if not isinstance(datum_path, str):
         raise TypeError("File Path Must Be A String")
-    
+
     datum = create_metadatum(file_path, tag, pid, tkn, version)
     write_metadatum_file(datum_path, datum)
 
@@ -476,13 +478,11 @@ def convert_metadata(file_path: str, datum_path: str, tag: str, pid: str, tkn: s
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-    
-    
+
     file_path = "../data/meta/corn.metadata.json"
-    datum_path = "../data/cip68/metadata-datum.json"
+    datum_path = "../data/meta/corn.metadatum.json"
     tag = '721'
     pid = '<policy_id>'
     tkn = '<asset_name>'
     version = 1
     convert_metadata(file_path, datum_path, tag, pid, tkn, version)
-    
