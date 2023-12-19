@@ -15,13 +15,14 @@ validator(hot_key: ByteArray) {
         // if no reward is found error
         let reward = find.stake_reward_by_sc(tx.withdrawals, stake_credential)
         when redeemer is {
-          // can only withdraw
+          // can withdraw the reward to anywhere
           Withdraw -> and {
               // no withdraw zero validations
               reward > 0,
               // cornucopias must sign it
               signing.verify_sig(tx.extra_signatories, hot_key),
             }
+          // anything else fails
           _ -> False
         }
       }
