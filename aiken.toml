@@ -1,5 +1,5 @@
 name = "aiken-lang/mint_contract"
-version = "0.2.0"
+version = "0.3.0"
 license = "GPL-3.0"
 description = "CIP68 Minting And Metadatum Storage Contracts for Cornucopias"
 
@@ -10,10 +10,10 @@ platform = "github"
 
 [[dependencies]]
 name = "aiken-lang/stdlib"
-version = "main"
+version = "1.7.0"
 source = "github"
 
 [[dependencies]]
 name = "logicalmechanism/assist"
-version = "main"
+version = "v0.4.6"
 source = "github"

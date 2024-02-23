@@ -1,19 +1,22 @@
-use aiken/transaction.{Publish, ScriptContext, WithdrawFrom}
-use aiken/transaction/certificate.{CredentialDelegation}
+use aiken/transaction.{Publish, ScriptContext, Transaction, WithdrawFrom}
+use aiken/transaction/certificate.{Certificate, CredentialDelegation}
 use aiken/transaction/credential.{Inline, ScriptCredential}
 use assist/find
 use assist/signing
 use mint_contract/types.{Delegate, StakingRedeemer, Withdraw}
 
-// The hot key controls the staking
-validator(hot_key: ByteArray) {
+validator(
+  // The hot key controls the staking
+  hot_key: ByteArray,
+) {
   fn params(redeemer: StakingRedeemer, context: ScriptContext) -> Bool {
-    let tx = context.transaction
+    let tx: Transaction = context.transaction
     when context.purpose is {
       // handle all withdrawals
       WithdrawFrom(stake_credential) -> {
         // if no reward is found error
-        let reward = find.stake_reward_by_sc(tx.withdrawals, stake_credential)
+        let reward: Int =
+          find.stake_reward_by_sc(tx.withdrawals, stake_credential)
         when redeemer is {
           // can withdraw the reward to anywhere
           Withdraw -> and {
@@ -31,11 +34,13 @@ validator(hot_key: ByteArray) {
         when redeemer is {
           // only delegate to secific pool
           Delegate(delegate_data) -> {
-            let new_delegation =
+            let new_delegation: Certificate =
               CredentialDelegation {
                 delegator: Inline(ScriptCredential(delegate_data.stake_cred)),
                 delegatee: delegate_data.pool_id,
               }
+            //
+            //
             and {
               // The only cert is for new delegation
               certificate == new_delegation,

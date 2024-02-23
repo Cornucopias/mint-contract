@@ -1,15 +1,17 @@
-use aiken/transaction.{ScriptContext, Spend}
-use aiken/transaction/value
+use aiken/transaction.{Input, ScriptContext, Spend, Transaction}
+use aiken/transaction/credential.{Address}
+use aiken/transaction/value.{Value}
 use assist/count
 use assist/find
 use assist/payout
 use assist/signing
-use mint_contract/types.{CIP68Datum, CIP68Redeemer, RemoveMeta, UpdateMeta}
+use assist/types/cip68.{CIP68}
+use mint_contract/types.{CIP68Redeemer, RemoveMeta, UpdateMeta}
 
 // This allows a hot key to update or remove metadatum for a cip68 token.
 validator(hot_key: ByteArray) {
   fn params(
-    _datum: CIP68Datum,
+    _datum: CIP68,
     redeemer: CIP68Redeemer,
     context: ScriptContext,
   ) -> Bool {
@@ -17,11 +19,11 @@ validator(hot_key: ByteArray) {
     when context.purpose is {
       Spend(output_reference) -> {
         // the transaction being validated
-        let tx = context.transaction
+        let tx: Transaction = context.transaction
         // this is the input being validated
-        let this_input = find.input_by_ref(tx.inputs, output_reference)
+        let this_input: Input = find.input_by_ref(tx.inputs, output_reference)
         // this script address
-        let this_addr = this_input.output.address
+        let this_addr: Address = this_input.output.address
         when redeemer is {
           // removes the utxo entirely from the contract
           // this doesn't check for burn or destination for more of an open ended approach
@@ -35,20 +37,19 @@ validator(hot_key: ByteArray) {
             }
           // updates the metadata and change min ada
           UpdateMeta { lovelace } -> {
-            // this validating value
-            let this_value = this_input.output.value
             // set a direction to add or remove the minimum lovelace
-            let cont_value =
+            let cont_value: Value =
               value.add(
-                this_value,
+                this_input.output.value,
                 value.ada_policy_id,
                 value.ada_asset_name,
                 lovelace,
               )
             // This should prevent utxos without cip68 datum to go to the cip68 storage contract
             // This Forces An Inline Datum!
-            expect _: CIP68Datum =
-              find.output_datum_by_addr(tx.outputs, this_addr)
+            expect _: CIP68 = find.output_datum_by_addr(tx.outputs, this_addr)
+            //
+            //
             and {
               // make sure value is continuing
               payout.exact(this_addr, cont_value, tx.outputs),
