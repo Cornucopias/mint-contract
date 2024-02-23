@@ -39,10 +39,11 @@ rm contracts/* || true
 rm hashes/* || true
 rm certs/* || true
 
-# build out the entire script
-echo -e "\033[1;34m\nBuilding Contracts\n\033[0m"
-aiken build
-# aiken build --keep-traces
+# remove all traces
+# aiken build --trace-level silent --filter-traces user-defined
+
+# keep the traces for testing if required
+aiken build --trace-level verbose --filter-traces all
 
 ###############################################################################
 ###############################################################################

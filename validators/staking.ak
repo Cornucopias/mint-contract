@@ -3,27 +3,28 @@ use aiken/transaction/certificate.{Certificate, CredentialDelegation}
 use aiken/transaction/credential.{Inline, ScriptCredential}
 use assist/find
 use assist/signing
+use assist/types/hashes.{PublicKeyHash}
 use mint_contract/types.{Delegate, StakingRedeemer, Withdraw}
 
 validator(
   // The hot key controls the staking
-  hot_key: ByteArray,
+  hot_key: PublicKeyHash,
 ) {
   fn params(redeemer: StakingRedeemer, context: ScriptContext) -> Bool {
     let tx: Transaction = context.transaction
     when context.purpose is {
       // handle all withdrawals
       WithdrawFrom(stake_credential) -> {
-        // if no reward is found error
+        // if no reward is found then error
         let reward: Int =
           find.stake_reward_by_sc(tx.withdrawals, stake_credential)
         when redeemer is {
           // can withdraw the reward to anywhere
           Withdraw -> and {
               // no withdraw zero validations
-              reward > 0,
+              (reward > 0)?,
               // cornucopias must sign it
-              signing.verify_sig(tx.extra_signatories, hot_key),
+              signing.verify_sig(tx.extra_signatories, hot_key)?,
             }
           // anything else fails
           _ -> False
@@ -43,9 +44,9 @@ validator(
             //
             and {
               // The only cert is for new delegation
-              certificate == new_delegation,
+              (certificate == new_delegation)?,
               // cornucopias must sign it
-              signing.verify_sig(tx.extra_signatories, hot_key),
+              signing.verify_sig(tx.extra_signatories, hot_key)?,
             }
           }
           // deregistration fails and anything else but changing delegation

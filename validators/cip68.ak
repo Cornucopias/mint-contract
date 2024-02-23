@@ -6,10 +6,13 @@ use assist/find
 use assist/payout
 use assist/signing
 use assist/types/cip68.{CIP68}
+use assist/types/hashes.{PublicKeyHash}
 use mint_contract/types.{CIP68Redeemer, RemoveMeta, UpdateMeta}
 
-// This allows a hot key to update or remove metadatum for a cip68 token.
-validator(hot_key: ByteArray) {
+validator(
+  // The hot key controls the metadatum
+  hot_key: PublicKeyHash,
+) {
   fn params(
     _datum: CIP68,
     redeemer: CIP68Redeemer,
@@ -29,11 +32,11 @@ validator(hot_key: ByteArray) {
           // this doesn't check for burn or destination for more of an open ended approach
           RemoveMeta -> and {
               // cornucopias must sign it
-              signing.verify_sig(tx.extra_signatories, hot_key),
+              signing.verify_sig(tx.extra_signatories, hot_key)?,
               // single script input
-              count.inputs_by_addr(tx.inputs, this_addr, 1),
+              count.inputs_by_addr(tx.inputs, this_addr, 1)?,
               // no script output
-              count.outputs_by_addr(tx.outputs, this_addr, 0),
+              count.outputs_by_addr(tx.outputs, this_addr, 0)?,
             }
           // updates the metadata and change min ada
           UpdateMeta { lovelace } -> {
@@ -52,13 +55,13 @@ validator(hot_key: ByteArray) {
             //
             and {
               // make sure value is continuing
-              payout.exact(this_addr, cont_value, tx.outputs),
+              payout.exact(this_addr, cont_value, tx.outputs)?,
               // cornucopias must sign it
-              signing.verify_sig(tx.extra_signatories, hot_key),
+              signing.verify_sig(tx.extra_signatories, hot_key)?,
               // single script input
-              count.inputs_by_addr(tx.inputs, this_addr, 1),
+              count.inputs_by_addr(tx.inputs, this_addr, 1)?,
               // single script output
-              count.outputs_by_addr(tx.outputs, this_addr, 1),
+              count.outputs_by_addr(tx.outputs, this_addr, 1)?,
             }
           }
         }

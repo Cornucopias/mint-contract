@@ -7,7 +7,7 @@ use assist/minting
 use assist/payout
 use assist/signing
 use assist/types/cip68.{CIP68}
-use assist/types/hashes.{TxHash}
+use assist/types/hashes.{PublicKeyHash, TxHash, ValidatorHash}
 use assist/values
 use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
 
@@ -15,7 +15,7 @@ use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
 // the hot key may be either the reference or nft.
 validator(
   // this key controls everything
-  hot_key: ByteArray,
+  hot_key: PublicKeyHash,
   // the cip 68 and stake data
   cip68_hash_data: Data,
   stake_hash_data: Data,
@@ -37,8 +37,8 @@ validator(
         when redeemer is {
           MintTokens -> {
             // cip68 address know at compile time
-            expect cip68_hash: ByteArray = cip68_hash_data
-            expect stake_hash: ByteArray = stake_hash_data
+            expect cip68_hash: ValidatorHash = cip68_hash_data
+            expect stake_hash: ValidatorHash = stake_hash_data
             // staking at this address
             let cip68_addr: Address =
               addresses.create_script_address(cip68_hash, stake_hash)
@@ -69,26 +69,26 @@ validator(
             //
             and {
               // cornucopias must sign it
-              signing.verify_sig(tx.extra_signatories, hot_key),
+              signing.verify_sig(tx.extra_signatories, hot_key)?,
               // prevent roll over double nft attack
-              first_index < 256,
+              (first_index < 256)?,
               // must mint 1 reference token
-              minting.exact(mint, own_currency_symbol, ref_tkn, 1),
+              minting.exact(mint, own_currency_symbol, ref_tkn, 1)?,
               // the nft can go anywhere; ref must go to metadatum contract
               // must mint 1 non-fungible token
-              minting.exact(mint, own_currency_symbol, nft_tkn, 1),
+              minting.exact(mint, own_currency_symbol, nft_tkn, 1)?,
               // reference token must go to cip contract
               payout.at_least(
                 cip68_addr,
                 value.from_asset(own_currency_symbol, ref_tkn, 1),
                 tx.outputs,
-              ),
+              )?,
             }
           }
           // burn the ref or the nft or both at the same time
           BurnTokens -> and {
               // cornucopias must sign it
-              signing.verify_sig(tx.extra_signatories, hot_key),
+              signing.verify_sig(tx.extra_signatories, hot_key)?,
               // this allows optional burning of either or both
               or {
                 // burn only 1 ref token
@@ -97,15 +97,15 @@ validator(
                   own_currency_symbol,
                   cip68.prefix_100,
                   -1,
-                ),
+                )?,
                 // burn only 1 nft
                 minting.by_prefix(
                   mint,
                   own_currency_symbol,
                   cip68.prefix_222,
                   -1,
-                ),
-              },
+                )?,
+              }?,
             }
         }
       // Mint Only
