@@ -41,7 +41,7 @@ validator(
           // updates the metadata and change min ada
           UpdateMeta { lovelace } -> {
             // set a direction to add or remove the minimum lovelace
-            let cont_value: Value =
+            let that_value: Value =
               value.add(
                 this_input.output.value,
                 value.ada_policy_id,
@@ -55,7 +55,7 @@ validator(
             //
             and {
               // make sure value is continuing
-              payout.exact(this_addr, cont_value, tx.outputs)?,
+              payout.exact(this_addr, that_value, tx.outputs)?,
               // cornucopias must sign it
               signing.verify_sig(tx.extra_signatories, hot_key)?,
               // single script input

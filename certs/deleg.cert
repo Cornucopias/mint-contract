@@ -1,5 +1,5 @@
 {
     "type": "CertificateShelley",
     "description": "Stake Delegation Certificate",
-    "cborHex": "83028201581c9138ce43764db9634c7a58f67128f2dcf3e88da630f2764b71946b60581c1e3105f23f2ac91b3fb4c35fa4fe301421028e356e114944e902005b"
+    "cborHex": "83028201581cabeb6e0f6d71b63303698ba872bce89e7ff4e3fed9b169ea2c09e53b581c1e3105f23f2ac91b3fb4c35fa4fe301421028e356e114944e902005b"
 }
