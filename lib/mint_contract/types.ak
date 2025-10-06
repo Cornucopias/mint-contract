@@ -22,5 +22,7 @@ pub type DelegateData {
 /// The stake can be withdrawn or delegated.
 pub type StakingRedeemer {
   Withdraw
-  Delegate(DelegateData)
+  DelegateStake(DelegateData)
+  RegisterStake(DelegateData)
+  UnRegisterStake(DelegateData)
 }

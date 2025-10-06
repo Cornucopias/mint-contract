@@ -1,71 +1,83 @@
-// use aiken/transaction/certificate.{Certificate, CredentialDelegation}
-// use aiken/transaction/credential.{Inline, ScriptCredential}
-// use assist/find
-// use assist/signing
-// use assist/types/hashes.{PublicKeyHash}
-// use cardano/transaction.{Publish, ScriptContext, Transaction, WithdrawFrom}
-// use mint_contract/types.{Delegate, StakingRedeemer, Withdraw}
+use aiken/crypto.{VerificationKeyHash}
+use cardano/address.{Credential, Script}
+use cardano/certificate.{
+  Certificate, DelegateBlockProduction, DelegateCredential, RegisterCredential,
+  UnregisterCredential,
+}
+use cardano/transaction.{Transaction}
+use cardano/tx as signing
+use mint_contract/types.{
+  DelegateStake, RegisterStake, StakingRedeemer, UnRegisterStake, Withdraw,
+}
+use validation/find
 
-// validator contract(
-//   // The hot key controls the staking
-//   hot_key: PublicKeyHash,
-// ) {
-//   withdraw(redeemer: StakingRedeemer, context: ScriptContext) {
-//     let tx: Transaction = context.transaction
-//     when context.purpose is {
-//       // handle all withdrawals
-//       WithdrawFrom(stake_credential) -> {
-//         // if no reward is found then error
-//         let reward: Int =
-//           find.stake_reward_by_sc(tx.withdrawals, stake_credential)
-//         when redeemer is {
-//           // can withdraw the reward to anywhere
-//           Withdraw -> and {
-//               // no withdraw zero validations
-//               (reward > 0)?,
-//               // cornucopias must sign it
-//               signing.verify_sig(tx.extra_signatories, hot_key)?,
-//             }
-//           // anything else fails
-//           _ -> False
-//         }
-//       }
-//       // handle all delegation certs
-//       Publish(certificate) ->
-//         when redeemer is {
-//           // only delegate to secific pool
-//           Delegate(delegate_data) -> {
-//             let new_delegation: Certificate =
-//               CredentialDelegation {
-//                 delegator: Inline(ScriptCredential(delegate_data.stake_cred)),
-//                 delegatee: delegate_data.pool_id,
-//               }
-//             //
-//             //
-//             and {
-//               // The only cert is for new delegation
-//               (certificate == new_delegation)?,
-//               // cornucopias must sign it
-//               signing.verify_sig(tx.extra_signatories, hot_key)?,
-//             }
-//           }
-//           // deregistration fails and anything else but changing delegation
-//           _ -> False
-//         }
-//       // anything else fails
-//       _ -> False
-//     }
-//   }
+validator contract(
+  // The hot key controls the staking
+  hot_key: VerificationKeyHash,
+) {
+  withdraw(
+    redeemer: StakingRedeemer,
+    credential: Credential,
+    transaction: Transaction,
+  ) {
+    let Transaction { withdrawals, extra_signatories, .. } = transaction
+    let reward: Int = find.stake_reward_by_sc(withdrawals, credential)
+    expect Withdraw = redeemer
+    and {
+      // no withdraw zero validations
+      (reward > 0)?,
+      // cornucopias must sign it
+      signing.verify_signature(extra_signatories, hot_key)?,
+    }
+  }
 
-//   publish(
-//     redeemer: StakingRedeemer,
-//     certificate: Certificate,
-//     transaction: Transaction,
-//   ) {
-//     todo
-//   }
+  publish(
+    redeemer: StakingRedeemer,
+    certificate: Certificate,
+    transaction: Transaction,
+  ) {
+    let Transaction { extra_signatories, .. } = transaction
+    when redeemer is {
+      DelegateStake(delegate_data) -> {
+        let new_delegation: Certificate =
+          DelegateCredential {
+            credential: Script(delegate_data.stake_cred),
+            delegate: DelegateBlockProduction {
+              stake_pool: delegate_data.pool_id,
+            },
+          }
+        and {
+          signing.verify_signature(extra_signatories, hot_key)?,
+          // The only cert is for new delegation
+          (certificate == new_delegation)?,
+        }
+      }
+      RegisterStake(delegate_data) -> {
+        let new_delegation: Certificate =
+          RegisterCredential {
+            credential: Script(delegate_data.stake_cred),
+            deposit: Never,
+          }
+        (certificate == new_delegation)?
+      }
+      UnRegisterStake(delegate_data) -> {
+        let new_delegation: Certificate =
+          UnregisterCredential {
+            credential: Script(delegate_data.stake_cred),
+            refund: Never,
+          }
+        and {
+          signing.verify_signature(extra_signatories, hot_key)?,
+          // The only cert is for new delegation
+          (certificate == new_delegation)?,
+        }
+      }
+      // anything else fails
+      _ -> False
+    }
+  }
 
-//   else(_) {
-//     fail
-//   }
-// }
+  else(_) {
+    fail
+  }
+}
