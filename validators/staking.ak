@@ -1,3 +1,6 @@
+////
+////
+
 use aiken/crypto.{VerificationKeyHash}
 use cardano/address.{Credential, Script}
 use cardano/certificate.{
@@ -26,7 +29,7 @@ validator contract(
     and {
       // no withdraw zero validations
       (reward > 0)?,
-      // cornucopias must sign it
+      // hot key must sign it
       signing.verify_signature(extra_signatories, hot_key)?,
     }
   }

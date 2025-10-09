@@ -1,9 +1,12 @@
+////
+////
+
 use aiken/crypto.{VerificationKeyHash}
 use cardano/address.{Address}
 use cardano/assets.{Value}
 use cardano/transaction.{Input, OutputReference, Transaction}
 use cardano/tx as signing
-use redeemers.{StorageRedeemer, RemoveMeta, UpdateMeta}
+use redeemers.{RemoveMeta, StorageRedeemer, UpdateMeta}
 use types/cip68.{CIP68}
 use validation/count
 use validation/find
@@ -30,7 +33,7 @@ validator contract(
             // removes the utxo entirely from the contract
             // this doesn't check for burn or destination for more of an open ended approach
             RemoveMeta -> and {
-                // cornucopias must sign it
+                // hot key must sign it
                 signing.verify_signature(extra_signatories, hot_key)?,
                 // single script input
                 count.inputs_by_addr(inputs, this_addr, 1)?,
@@ -55,7 +58,7 @@ validator contract(
               and {
                 // make sure value is continuing
                 payout.exact(this_addr, that_value, outputs)?,
-                // cornucopias must sign it
+                // hot key must sign it
                 signing.verify_signature(extra_signatories, hot_key)?,
                 // single script input
                 count.inputs_by_addr(inputs, this_addr, 1)?,

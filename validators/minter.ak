@@ -1,3 +1,6 @@
+////
+////
+
 use aiken/crypto.{ScriptHash, VerificationKeyHash}
 use cardano/address.{Address}
 use cardano/addresses
@@ -16,8 +19,8 @@ use validation/payout
 validator contract(
   // this key controls everything
   hot_key: VerificationKeyHash,
-  // the cip 68 and stake data
-  cip68_hash: ScriptHash,
+  // the storage and stake data
+  storage_hash: ScriptHash,
   stake_hash: ScriptHash,
   // this allows many policy ids
   _random_string: Data,
@@ -37,9 +40,9 @@ validator contract(
     // mint only
     when redeemer is {
       MintTokens -> {
-        // cip68 address know at compile time
-        let cip68_addr: Address =
-          addresses.create_script_address(cip68_hash, stake_hash)
+        // storage address know at compile time
+        let storage_addr: Address =
+          addresses.create_script_address(storage_hash, stake_hash)
         // get first input info from the tx in lexographical order
         let first_index: Int = find.first_input_index(inputs)
         let first_tx_hash: TransactionId = find.first_input_txid(inputs)
@@ -61,23 +64,23 @@ validator contract(
           )
         // this should prevent utxos without cip68 datum to go to the cip68 storage contract
         // This Forces An Inline Datum!
-        expect _: CIP68 = find.output_datum_by_addr(outputs, cip68_addr)
+        expect _: CIP68 = find.output_datum_by_addr(outputs, storage_addr)
         //
         // The hot key has to sign the tx to mint 1 ref and 1 nft. There
         // is destination validation for the cip68 token but not for the 
         // nft. This should allow a lot of flexability.
         //
         and {
-          // cornucopias must sign it
+          // hot key must sign it
           signing.verify_signature(extra_signatories, hot_key)?,
           // must mint 1 reference token
           minting.exact(mint, currency_symbol, ref_tkn, 1)?,
           // the nft can go anywhere; ref must go to metadatum contract
           // must mint 1 non-fungible token
           minting.exact(mint, currency_symbol, nft_tkn, 1)?,
-          // reference token must go to cip contract
+          // reference token must go to storage contract
           payout.at_least(
-            cip68_addr,
+            storage_addr,
             assets.from_asset(currency_symbol, ref_tkn, 1),
             outputs,
           )?,
@@ -85,7 +88,7 @@ validator contract(
       }
       // burn the ref or the nft or both at the same time
       BurnTokens -> and {
-          // cornucopias must sign it
+          // hot key must sign it
           signing.verify_signature(extra_signatories, hot_key)?,
           // this allows optional burning of either or both
           or {
