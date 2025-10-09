@@ -40,10 +40,10 @@ rm hashes/* || true
 rm certs/* || true
 
 # remove all traces
-# aiken build --trace-level silent --filter-traces user-defined
+aiken build --trace-level silent --trace-filter user-defined
 
 # keep the traces for testing if required
-aiken build --trace-level verbose --filter-traces all
+# aiken build --trace-level verbose --trace-filter all
 
 ###############################################################################
 ###############################################################################
@@ -64,27 +64,25 @@ mv start_info-new.json start_info.json
 hot=$(jq -r '.hotKey' start_info.json)
 hot_cbor=$(python3 -c "import cbor2;hex_string='${hot}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
 
-echo -e "\033[1;33m\nConvert CIP68 Metadatum Storage Contract\033[0m"
-aiken blueprint apply -o plutus.json -v cip68.params "${hot_cbor}"
-aiken blueprint convert -v cip68.params > contracts/cip68_contract.plutus
-${cli} transaction policyid --script-file contracts/cip68_contract.plutus > hashes/cip68.hash
+echo -e "\033[1;33m\nConvert Metadatum Storage Contract\033[0m"
+aiken blueprint apply -o plutus.json -m storage "${hot_cbor}"
+aiken blueprint convert -m storage > contracts/storage_contract.plutus
+${cli} conway transaction policyid --script-file contracts/storage_contract.plutus > hashes/storage.hash
 
 # convert cip 68 hash into cbor
-cip68_hash=$(cat hashes/cip68.hash)
-cip68_hash_cbor=$(python3 -c "import cbor2;hex_string='${cip68_hash}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
+storage_hash=$(cat hashes/storage.hash)
+storage_hash_cbor=$(python3 -c "import cbor2;hex_string='${storage_hash}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
 
-echo -e "\033[1;33m\nConvert CIP68 Staking Contract\033[0m"
-aiken blueprint apply -o plutus.json -v staking.params "${hot_cbor}"
-aiken blueprint convert -v staking.params > contracts/stake_contract.plutus
-${cli} transaction policyid --script-file contracts/stake_contract.plutus > hashes/stake.hash
+echo -e "\033[1;33m\nConvert Staking Contract\033[0m"
+aiken blueprint apply -o plutus.json -m staking "${hot_cbor}"
+aiken blueprint convert -m staking > contracts/staking_contract.plutus
+${cli} conway transaction policyid --script-file contracts/staking_contract.plutus > hashes/staking.hash
 
 # create the staking certs
-${cli} stake-address registration-certificate --stake-script-file contracts/stake_contract.plutus --out-file certs/stake.cert
-poolId=$(jq -r '.poolId' start_info.json)
-${cli} stake-address delegation-certificate --stake-script-file contracts/stake_contract.plutus --stake-pool-id ${poolId} --out-file certs/deleg.cert
+${cli} conway stake-address registration-certificate --stake-script-file contracts/staking_contract.plutus --key-reg-deposit-amt 2000000 --out-file certs/staking.cert
 
 # convert cip 68 hash into cbor
-staking_hash=$(cat hashes/stake.hash)
+staking_hash=$(cat hashes/staking.hash)
 staking_hash_cbor=$(python3 -c "import cbor2;hex_string='${staking_hash}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
 
 # Update Staking Redeemer
@@ -101,12 +99,12 @@ ran=$(jq -r '.random' start_info.json)
 ran_cbor=$(python3 -c "import cbor2;hex_string='${ran}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
 
 echo -e "\033[1;33m\nConvert Minting Contract\033[0m"
-aiken blueprint apply -o plutus.json -v minter.params "${hot_cbor}"
-aiken blueprint apply -o plutus.json -v minter.params "${cip68_hash_cbor}"
-aiken blueprint apply -o plutus.json -v minter.params "${staking_hash_cbor}"
-aiken blueprint apply -o plutus.json -v minter.params "${ran_cbor}"
-aiken blueprint convert -v minter.params > contracts/mint_contract.plutus
-${cli} transaction policyid --script-file contracts/mint_contract.plutus > hashes/mint.hash
+aiken blueprint apply -o plutus.json -m minter "${hot_cbor}"
+aiken blueprint apply -o plutus.json -m minter "${storage_hash_cbor}"
+aiken blueprint apply -o plutus.json -m minter "${staking_hash_cbor}"
+aiken blueprint apply -o plutus.json -m minter "${ran_cbor}"
+aiken blueprint convert -m minter > contracts/minter_contract.plutus
+${cli} conway transaction policyid --script-file contracts/minter_contract.plutus > hashes/minter.hash
 
 # end of build
 echo -e "\033[1;32m\nBuilding Complete!\033[0m"

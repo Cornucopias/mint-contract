@@ -3,7 +3,7 @@ use cardano/address.{Address}
 use cardano/assets.{Value}
 use cardano/transaction.{Input, OutputReference, Transaction}
 use cardano/tx as signing
-use mint_contract/types.{CIP68Redeemer, RemoveMeta, UpdateMeta}
+use redeemers.{StorageRedeemer, RemoveMeta, UpdateMeta}
 use types/cip68.{CIP68}
 use validation/count
 use validation/find
@@ -15,7 +15,7 @@ validator contract(
 ) {
   spend(
     maybe_datum: Option<Data>,
-    redeemer: CIP68Redeemer,
+    redeemer: StorageRedeemer,
     output_reference: OutputReference,
     transaction: Transaction,
   ) {

@@ -6,7 +6,7 @@ use cardano/certificate.{
 }
 use cardano/transaction.{Transaction}
 use cardano/tx as signing
-use mint_contract/types.{
+use redeemers.{
   DelegateStake, RegisterStake, StakingRedeemer, UnRegisterStake, Withdraw,
 }
 use validation/find

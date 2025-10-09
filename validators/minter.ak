@@ -6,7 +6,7 @@ use cardano/minting
 use cardano/transaction.{Transaction, TransactionId}
 use cardano/tx as signing
 use cardano/value
-use mint_contract/types.{BurnTokens, MintRedeemer, MintTokens}
+use redeemers.{BurnTokens, MintTokens, MinterRedeemer}
 use types/cip68.{CIP68}
 use validation/find
 use validation/payout
@@ -23,7 +23,7 @@ validator contract(
   _random_string: Data,
 ) {
   mint(
-    redeemer: MintRedeemer,
+    redeemer: MinterRedeemer,
     currency_symbol: PolicyId,
     transaction: Transaction,
   ) {
